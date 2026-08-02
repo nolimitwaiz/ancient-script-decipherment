@@ -1,0 +1,130 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{parskip}
+
+% Bump on every substantive edit (phase0-v1 -> phase0-v2), then `make reports`.
+% scripts/check_reports_fresh.py greps the built PDF for this exact string.
+\newcommand{\ReportStamp}{phase0-v1}
+
+\title{GLYPHOS --- Phase 0 Report\\
+\large Scaffold, Experiment Ledger, Reproducibility Infrastructure}
+\author{Waiz Khan\\ \small JHU CLSP --- advisor: Philipp Koehn}
+\date{August 1, 2026 \quad {\small stamp: \ReportStamp}}
+
+\begin{document}
+\maketitle
+
+\section{Mission and hard constraints}
+GLYPHOS is a from-scratch pipeline for visual modeling, restoration,
+translation, and constrained decipherment of ancient scripts, validated by
+\emph{artificial decipherment}: hide the key of an already-deciphered script,
+run the pipeline, and measure recovery. It combines the Salesky/Koehn pixel-
+representation lineage, the Luo--Barzilay constrained-decipherment lineage,
+and a quant-derived statistical epistemics layer.
+
+Four constraints are enforced by tooling, not convention:
+\begin{enumerate}
+  \item \textbf{No pretrained model weights, anywhere.} A component pretrained
+        on the open web may have seen Ugaritic or Linear~B scholarship;
+        any decipherment it produces is void (lookahead bias). A CI gate
+        greps the sealed tree for pretrained-loading APIs; the (currently
+        empty) \texttt{contrib/openbook/} directory is the only exclusion.
+        Pretrained \emph{datasets} are allowed; pretrained \emph{models} are not.
+  \item \textbf{Ledger before results.} Every run --- including failed,
+        abandoned, and smoke runs --- is registered with a non-empty
+        hypothesis \emph{before} results exist, and closed with exactly one
+        terminal event.
+  \item \textbf{Locked test sets.} Every read of a path under
+        \texttt{data/**/test/} is audit-logged with the active run id.
+  \item \textbf{Reproducibility.} Explicit seeds (3+ for headline numbers),
+        strict YAML$\to$dataclass configs, content-hashed data and split
+        versions recorded per run.
+\end{enumerate}
+
+\section{What was built}
+\begin{itemize}
+  \item \textbf{Scaffold:} \texttt{uv} project (Python 3.12), ruff, pytest,
+        Makefile, GitHub Actions CI; package layout for all eight phases with
+        loud stubs where later phases will land.
+  \item \textbf{Experiment ledger} (\texttt{glyphos/ledger/}): append-only
+        JSONL with a two-event lifecycle
+        (\texttt{register}$\to$\texttt{complete}). Registration requires the
+        hypothesis and computes the family's running variant count
+        (\texttt{n\_variants\_tried\_}\allowbreak\texttt{so\_far\_in\_this\_family})
+        from the ledger itself, so the multiple-testing count cannot be
+        curated after the fact. A context manager guarantees crashed runs are recorded as
+        \texttt{failed}. CLI: \texttt{glyphos-ledger
+        \{report,list,show,register,complete\}}; the report shows, per family,
+        the number of variants tried, the full metric distribution (never
+        just the max), and rank stability across seeds (mean pairwise Kendall
+        $\tau_a$ between per-seed config rankings).
+  \item \textbf{Seed management:} one call seeds python/numpy/torch;
+        \texttt{require\_seeds} enforces the 3-seed headline policy;
+        \texttt{derive\_seed} gives stable component-level seeds.
+  \item \textbf{Test-set guard:} patches both \texttt{builtins.open} and
+        \texttt{io.open} (covering \texttt{pathlib}); reads under
+        \texttt{data/**/test/} are appended to an audit log with timestamp,
+        run id, path, and caller. Log-only in Phase~0; enforcement arrives
+        with frozen-split manifests in Phase~1.
+  \item \textbf{Hard-constraint gate:} \texttt{make check-no-pretrained}
+        fails the build on \texttt{from\_pretrained}, \texttt{AutoModel*},
+        \texttt{torch.hub}, hub-download APIs, and friends; tested in both
+        directions (clean passes, planted violation fails, openbook exempt).
+  \item \textbf{Report system:} \texttt{make reports} rebuilds \emph{all}
+        \LaTeX{} reports in one pass (tectonic 0.17; no TeX previously existed
+        on the dev machine) and a freshness gate verifies each PDF embeds its
+        source's \texttt{\textbackslash ReportStamp} and is not older than the
+        \texttt{.tex}.
+\end{itemize}
+
+\section{Smoke pipeline result}
+\texttt{make smoke} runs the smallest real instance of the artificial-
+decipherment protocol end to end, in the exact lifecycle shape every later
+phase must follow: strict config $\to$ guard install $\to$ seeding $\to$ data
+generation with content hashes $\to$ ledger registration (hypothesis first)
+$\to$ fit on train $\to$ select on valid $\to$ score on the locked test split
+(audited) $\to$ terminal ledger event $\to$ family report. The task: recover a
+hidden 12-letter substitution key over a Zipfian toy language by
+frequency-rank matching, under a document-held-out split.
+
+\begin{table}[h]\centering
+\begin{tabular}{lr}
+\toprule
+metric (run \texttt{20260802-002751-6a0a99}, seed 1337) & value \\
+\midrule
+key\_accuracy (12-symbol hidden key)   & 1.000 \\
+valid\_token\_accuracy                 & 1.000 \\
+test\_token\_accuracy                  & 1.000 \\
+audited locked-test reads              & 1 \\
+wall time (budget: 300 s)              & 0.02 s \\
+\bottomrule
+\end{tabular}
+\caption{Phase-0 smoke: infrastructure demonstration, not science. The
+pipeline asserts its own guard-audit entry and a key-accuracy regression
+floor of 0.5.}
+\end{table}
+
+\section{Verification}
+49 pytest tests (0.24\,s), all state-isolated: ledger lifecycle, corruption
+handling, variant counters, report distributions and rank stability, both
+guard patch routes, seeds, hashing, strict configs, toy-corpus determinism
+and split disjointness, frequency-matching correctness, CLI round-trip, and
+the no-pretrained gate. \texttt{make check} (lint + tests + gate + smoke) is
+green.
+
+\section{Next: Phase 1}
+Ingest TLA (all HuggingFace subsets, with provenance), Coptic SCRIPTORIUM,
+LogogramNLP, and Ugaritic+Hebrew; produce the census table; implement the six
+split schemes (random, document-held-out, dedup, period, site, sign-held-out);
+hash and freeze all test partitions and extend the guard with freeze
+enforcement. Known gaps (D\=AMOS/LiBER access, Ugaritic source location) are
+filed in \texttt{docs/data\_gaps.md}.
+
+\vfill
+\noindent\rule{\linewidth}{0.4pt}\\
+{\small GLYPHOS Phase 0 report \(\cdot\) stamp \ReportStamp{} \(\cdot\)
+regenerate with \texttt{make reports}}
+\end{document}
