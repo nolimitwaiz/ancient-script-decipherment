@@ -103,3 +103,37 @@ PangoCairo + Noto (incl. Egyptian Hieroglyphs), 24×24 windows / stride 12,
 degradation suite with `damage_level`, multiscript SSL stream; `<g>…</g>`
 sign-markup handling. Requires cairo/pango system libraries — install path for
 this Mac to be decided at phase start (no Homebrew present).
+
+## Addendum — frontier + remaining corpora (2026-08-02, second pass)
+
+On request, every remaining openly-obtainable corpus was downloaded and
+integrated (census regenerated; now 11 ingested corpora, 26 frozen test
+partitions):
+
+| corpus | records | docs | primary tokens | data_version |
+|---|---|---|---|---|
+| greek_first1k | 392,478 | 1,090 works | 28,819,389 | 0bf0e2da23cb |
+| cuneiform_cdli | 132,210 | 132,158 tablets | 8,926,282 | dc44c5043a29 |
+| meroitic_rem | 18,103 | 4 | 757,666 | f2774ec03aa2 |
+
+- **Greek** (First1KGreek TEI): the earlier cluster-deferral was reversed —
+  parsing cost 15 s. Splits: random / document_heldout / dedup.
+- **Cuneiform** (CDLI 2023-10 open-data snapshot): tablet-level records with
+  catalogue language + period; period_heldout uses categorical period strings.
+- **Meroitic** (Otten & Anastasopoulos 2025): first machine-readable corpus;
+  frontier decipherment target, so splits are deferred to the Phase 5
+  protocol. The release's pretrained embeddings are quarantined (sealed
+  constraint).
+- **Mayan / Libyco-Berber**: no open bulk source exists (MHD application-
+  gated; LBI defunct, domain squatted — recover from pre-2020 Wayback
+  captures). Documented with unblock paths in data_gaps.md.
+
+Dedup for the two big monolingual LM corpora runs EXACT-duplicate-only
+(`--dedup-max-norm-dist 0`): Greek −617, CDLI −1,891 verbatim duplicates.
+Rationale: the near-duplicate pass costs hours at this scale for marginal
+gain on non-headline corpora (the TLA headline splits keep the full
+near-dup treatment); recorded in split_info.json and decisions.md.
+
+Operational lesson: a closed lid pauses local background jobs (the first
+near-dup attempt "ran" 10 wall-hours but got 38 CPU-minutes) — long local
+steps now run under `caffeinate -i`.

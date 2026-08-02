@@ -95,3 +95,24 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
 - Freeze manifest lives at configs/frozen_splits.json (committed) — data/ is
   never committed, so split identity must live in git; guard enforces
   hash-on-read and refuses write-mode opens of frozen files.
+
+## Phase 1 addendum (2026-08-02, frontier downloads)
+
+- Cuneiform source = CDLI open-data snapshot (2023-10) — the canonical open
+  corpus and what LogogramNLP built on; ancient-text staleness is a non-issue.
+  Record granularity = one tablet (the tablet IS the document).
+- Greek deferral reversed: First1KGreek parsed locally in 15 s — the "defer to
+  cluster" call was based on an overestimate; corrected rather than kept.
+- Meroitic corpus = Otten & Anastasopoulos 2025 release; its pretrained
+  embeddings are quarantined — the sealed constraint covers data releases
+  that happen to contain trained parameters.
+- period_heldout generalized: numeric dating (TLA) → century buckets;
+  categorical period strings (CDLI) → whole-value groups.
+- Mayan/Libyco-Berber stay stubs on evidence (application-gated / defunct DB),
+  with concrete unblock paths recorded in data_gaps — not for lack of trying.
+- Greek/CDLI dedup = exact-only (threshold flag --dedup-max-norm-dist 0) —
+  near-dup at this scale costs hours for marginal benefit on LM corpora;
+  TLA headline splits keep the full near-dup pass. Parameter recorded in
+  every split_info.json.
+- Long-running local steps run under `caffeinate -i` — system sleep froze a
+  10-hour wall-clock job at 38 CPU-minutes; wall time is not compute time.

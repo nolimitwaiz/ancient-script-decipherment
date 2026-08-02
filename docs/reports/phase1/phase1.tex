@@ -6,7 +6,7 @@
 \usepackage{parskip}
 
 % Bump on every substantive edit (phase1-v1 -> phase1-v2), then `make reports`.
-\newcommand{\ReportStamp}{phase1-v1}
+\newcommand{\ReportStamp}{phase1-v2}
 
 \title{GLYPHOS --- Phase 1 Report\\
 \large Data: Acquisition, Census, Frozen Splits}
@@ -106,6 +106,22 @@ stride 12, the composable degradation suite with \texttt{damage\_level}, the
 multiscript self-supervised stream, and \texttt{<g>\dots</g>} sign-markup
 handling. Requires cairo/pango system libraries; install path for this
 machine decided at phase start.
+
+
+\section*{Addendum (second pass, 2026-08-02): frontier downloads}
+Every remaining openly-obtainable corpus was downloaded and integrated ---
+the census now counts \textbf{11 ingested corpora and 26 frozen test
+partitions}: First1KGreek (392{,}478 passages, 28.8M tokens; the cluster
+deferral was reversed --- parsing cost 15\,s), CDLI cuneiform (132{,}210
+tablets with catalogue language/period; categorical period-held-out), and
+the first machine-readable \textbf{Meroitic} corpus (Otten \&
+Anastasopoulos 2025; 18{,}103 lines; its bundled pretrained embeddings are
+quarantined under the sealed constraint). Mayan and Libyco-Berber have no
+open bulk source (MHD application-gated; the LBI database is defunct and
+its domain squatted --- recoverable from pre-2020 Wayback captures);
+concrete unblock paths are filed in \texttt{docs/data\_gaps.md}. Dedup for
+the two large monolingual LM corpora is exact-duplicate-only (Greek $-$617,
+CDLI $-$1{,}891); TLA headline splits keep the full near-duplicate pass.
 
 \vfill
 \noindent\rule{\linewidth}{0.4pt}\\

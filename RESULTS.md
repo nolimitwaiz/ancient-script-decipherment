@@ -39,3 +39,10 @@ Contamination quantified — dedup (near-dup vs train, headline scheme) removed
 from test/valid: Earlier Egyptian 964/2,821 (~34%), Coptic 1,846, Demotic
 225, Late 62, Hebrew 59. Naive splits on this data overstate test size and
 inflate scores; headline numbers use `dedup` splits only.
+
+### Phase 1 second pass (frontier downloads)
+
+greek_first1k 392,478 passages / 28.8M tokens; cuneiform_cdli 132,210
+tablets / 8.9M tokens (language+period metadata); meroitic_rem 18,103 lines
+(first machine-readable Meroitic corpus). 26 frozen test partitions total,
+all verified. Exact-dedup removals: Greek 617, CDLI 1,891.

@@ -42,3 +42,33 @@ Format: status · gap · what exists instead · unblock path.
   published-comparison data. Full DĀMOS/LiBER corpus remains OPEN above.
 - **RESOLVED 2026-08-02 · Hebrew Bible export choice** — OpenScriptures
   morphhb (WLC, CC BY 4.0); see decisions.
+
+## Frontier-source survey + downloads (2026-08-02, second pass)
+
+- **RESOLVED · Meroitic** — Otten & Anastasopoulos, "Towards Ancient Meroitic
+  Decipherment" (ALP 2025): first machine-readable Meroitic corpus, ingested
+  as `meroitic_rem` (18,103 lines; mero-corpus + Hamadab/Kalabsha/Tanyidamani
+  narratives). Upstream license unstated (cite the paper); the repo's
+  pretrained Embeddings/ are QUARANTINED under the sealed constraint. The REM
+  print volumes themselves (Persée scans) remain image-only.
+- **RESOLVED · Greek** — First1KGreek ingested locally after all (392,478
+  passages, 28.8M tokens; parse cost 15 s, so the cluster deferral was
+  unnecessary). Supersedes the Phase 1 stub entry.
+- **RESOLVED · Cuneiform** — CDLI open-data snapshot (cdli-gh/data, 2023-10,
+  Git-LFS files fetched directly): 132,210 tablets with language/period from
+  the catalogue, ingested as `cuneiform_cdli`. LogogramNLP's own Akkadian
+  subset remains unpublished in their repo (entry above stays for the Phase 7
+  comparison hooks).
+- **OPEN · Mayan** — no open bulk download exists (2026-08 survey): MHD is
+  application-gated (CSU Chico), mayacorpus.org (200k+ glyph blocks, MHD-
+  sourced) is interactive-only, TWKM/Bonn publishes no public TEI dump.
+  Unblock: apply to MHD and/or email the projects. Mayan is a validation-rung
+  candidate (deciphered logosyllabic), not undeciphered.
+- **OPEN · Libyco-Berber** — the only digital corpus (LBI, ~300 panels) is
+  DEFUNCT: project ended after Werner Pichler's death and lbi-project.org is
+  now domain-squatted by a gambling site. Recovery path: pre-2020 Wayback
+  captures of institutum-canarium.org/lbi-project (inscr_data.php pages)
+  confirmed to exist — scrape the archive when the frontier phase needs it.
+- **OPEN (updated) · Linear B DAMOS/LiBER** — both are web databases without
+  bulk export; LiBER additionally exposes a CNR SPARQL endpoint (data.cnr.it)
+  worth pursuing. Rung 2 remains covered by the Luo cognate pairs.
