@@ -121,3 +121,13 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   for data prep and rendering; GPU requests are typeless (any free card).
   Cluster harness at scripts/cluster/ (sync, env bootstrap, job templates);
   blocked only on one-time interactive key authorization.
+
+## Phase 2 start (2026-08-02)
+
+- Render environment = micromamba (user-level, ~/micromamba-envs/glyphos-render):
+  pycairo + pygobject + pango + harfbuzz (typelib was the missing piece) +
+  numpy. Ancient-script Noto fonts (Egyptian Hieroglyphs, Coptic, Linear B,
+  Cuneiform, Meroitic) installed to ~/.local/share/fonts — conda fontconfig
+  does NOT scan ~/Library/Fonts. All six target scripts confirmed rendering
+  ink at 10pt. Open item: unify render env with the uv venv (two interpreters
+  is temporary; cluster setup will install pycairo against system cairo).
