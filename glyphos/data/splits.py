@@ -241,14 +241,16 @@ def dedup_against_train(
             max_dist = int(max_norm_dist * len(norm))
             near = False
             if max_dist > 0:
-                bag_lb = np.abs(train_bags - _bag(norm)).sum(axis=1) // 2
-                candidates = np.flatnonzero(
-                    (np.abs(train_lens - len(norm)) <= max_dist) & (bag_lb <= max_dist)
-                )
-                for idx in candidates:
-                    if levenshtein_within(norm, train_norms[int(idx)], max_dist):
-                        near = True
-                        break
+                # length window first (arrays are length-sorted), bag bound
+                # only inside it — orders of magnitude fewer rows touched
+                lo = int(np.searchsorted(train_lens, len(norm) - max_dist, side="left"))
+                hi = int(np.searchsorted(train_lens, len(norm) + max_dist, side="right"))
+                if lo < hi:
+                    bag_lb = np.abs(train_bags[lo:hi] - _bag(norm)).sum(axis=1) // 2
+                    for idx in np.flatnonzero(bag_lb <= max_dist):
+                        if levenshtein_within(norm, train_norms[lo + int(idx)], max_dist):
+                            near = True
+                            break
             if near:
                 removed_near += 1
             else:

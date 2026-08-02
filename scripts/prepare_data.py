@@ -29,6 +29,7 @@ from glyphos.data.splits import (
     DEFAULT_RATIOS,
     dedup_against_train,
     split_document,
+    split_metadata,
     split_period,
     split_random,
     split_sign_heldout,
@@ -151,7 +152,7 @@ def cmd_census(_args: argparse.Namespace) -> int:
 # -- split ------------------------------------------------------------------
 
 
-def _apply_scheme(scheme: str, records: list, meta, seed: int):
+def _apply_scheme(scheme: str, records: list, meta, seed: int, dedup_max_norm_dist: float = 0.1):
     if scheme == "random":
         return split_random(records, DEFAULT_RATIOS, seed), {}
     if scheme == "document_heldout":
@@ -161,15 +162,22 @@ def _apply_scheme(scheme: str, records: list, meta, seed: int):
         # target side for parallel corpora (full coverage); primary text for
         # monolingual ones (translations there are partial, e.g. Coptic text_en)
         target = meta.translation_field if meta.kind == "parallel" else meta.primary_field
-        deduped, report = dedup_against_train(base, target_field=target)
+        deduped, report = dedup_against_train(
+            base, target_field=target, max_norm_dist=dedup_max_norm_dist
+        )
         return deduped, {
             "dedup_target_field": target,
+            "dedup_max_norm_dist": dedup_max_norm_dist,
             "dedup_checked": report.checked,
             "dedup_removed_exact": report.removed_exact,
             "dedup_removed_near": report.removed_near,
         }
     if scheme == "period_heldout":
-        return split_period(records, DEFAULT_RATIOS, seed), {}
+        # TLA-style numeric dating -> century buckets; else categorical period
+        # strings (e.g. CDLI "Ur III (ca. 2100-2000 BC)") as whole groups
+        if any("dateNotBefore" in r.meta for r in records):
+            return split_period(records, DEFAULT_RATIOS, seed), {}
+        return split_metadata(records, "period", DEFAULT_RATIOS, seed), {}
     if scheme == "sign_heldout":
         result = split_sign_heldout(records, meta.primary_field, DEFAULT_RATIOS, seed)
         return result.splits, {"held_out_signs": result.held_out_signs}
@@ -189,7 +197,7 @@ def cmd_split(args: argparse.Namespace) -> int:
     for scheme in schemes:
         if scheme not in spec.schemes:
             raise SystemExit(f"scheme {scheme!r} not applicable to {args.corpus}: {spec.schemes}")
-        splits, extra = _apply_scheme(scheme, records, meta, args.seed)
+        splits, extra = _apply_scheme(scheme, records, meta, args.seed, args.dedup_max_norm_dist)
         version, out_dir = freeze.write_split(splits, args.corpus, scheme, args.tag)
         info = {
             "corpus": args.corpus,
@@ -245,6 +253,12 @@ def main(argv: list[str] | None = None) -> int:
     p_spl.add_argument("--all-schemes", action="store_true")
     p_spl.add_argument("--tag", default="v1")
     p_spl.add_argument("--seed", type=int, default=1234)
+    p_spl.add_argument(
+        "--dedup-max-norm-dist",
+        type=float,
+        default=0.1,
+        help="near-dup threshold for the dedup scheme; 0 = exact duplicates only",
+    )
 
     p_frz = sub.add_parser("freeze", help="freeze a split's test partition")
     p_frz.add_argument("--corpus", required=True)

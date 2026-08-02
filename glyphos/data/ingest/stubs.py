@@ -2,68 +2,55 @@
 
 Each raises NotIngestable with the concrete unblock path; census lists them
 as planned so the gap is visible in every report (docs/data_gaps.md).
+Findings dated 2026-08-02 from a live source survey.
 """
 
 from glyphos.data.ingest import CorpusMeta, NotIngestable
 
 STUB_REASONS = {
-    "greek_first1k": (
-        "First1KGreek (~1 GB TEI XML) is deliberately deferred to a cluster-side "
-        "ingest before Phase 3 (sealed Greek LM); see docs/data_gaps.md"
-    ),
     "linear_b_damos": (
-        "DAMOS/LiBER access method still unknown — loader interface reserved; "
-        "Luo et al.'s Linear B-Greek cognate pairs ARE available as "
-        "linearb_greek_cognates; see docs/data_gaps.md"
+        "DAMOS (Oslo) and LiBER (liber.cnr.it) are web databases without bulk export; "
+        "LiBER exposes a CNR SPARQL endpoint (data.cnr.it) worth pursuing. Luo et al.'s "
+        "linearb_greek_cognates already cover ladder rung 2; see docs/data_gaps.md"
     ),
-    "meroitic_rem": "frontier target (REM), not a Phase 1 blocker",
-    "mayan": "frontier target, not a Phase 1 blocker",
-    "libyco_berber": "frontier target, not a Phase 1 blocker",
+    "mayan": (
+        "no open bulk download found (2026-08): MHD requires an application (CSU Chico), "
+        "mayacorpus.org (200k+ glyph blocks, MHD-sourced) is interactive-only, TWKM/Bonn "
+        "publishes no public TEI dump — contact the projects; see docs/data_gaps.md"
+    ),
+    "libyco_berber": (
+        "the LBI database is DEFUNCT (project ended after W. Pichler's death; "
+        "lbi-project.org domain is now squatted). ~300 panels survive in Wayback "
+        "snapshots of institutum-canarium.org/lbi-project (use pre-2020 captures); "
+        "recover via archive scrape when needed; see docs/data_gaps.md"
+    ),
 }
 
 _META = {
-    "greek_first1k": CorpusMeta(
-        name="greek_first1k",
-        kind="stub",
-        source="https://github.com/OpenGreekAndLatin/First1KGreek",
-        license="CC-BY-SA-4.0",
-        encoding="unicode polytonic Greek (TEI XML)",
-        primary_field=None,
-        notes=STUB_REASONS["greek_first1k"],
-    ),
     "linear_b_damos": CorpusMeta(
         name="linear_b_damos",
         kind="stub",
-        source="DAMOS (Oslo) / LiBER (CNR) — access TBD",
+        source="DAMOS (Oslo) / LiBER (CNR, liber.cnr.it) — no bulk export",
         license="TBD",
         encoding="unicode Linear B",
         primary_field=None,
         notes=STUB_REASONS["linear_b_damos"],
     ),
-    "meroitic_rem": CorpusMeta(
-        name="meroitic_rem",
-        kind="stub",
-        source="Répertoire d'Épigraphie Méroïtique — access TBD",
-        license="TBD",
-        encoding="transliteration",
-        primary_field=None,
-        notes=STUB_REASONS["meroitic_rem"],
-    ),
     "mayan": CorpusMeta(
         name="mayan",
         kind="stub",
-        source="TBD",
+        source="MHD (application) / mayacorpus.org (interactive) / TWKM Bonn (no dump)",
         license="TBD",
-        encoding="TBD",
+        encoding="glyph-block transliterations + images",
         primary_field=None,
         notes=STUB_REASONS["mayan"],
     ),
     "libyco_berber": CorpusMeta(
         name="libyco_berber",
         kind="stub",
-        source="TBD",
+        source="LBI database (defunct) via Wayback Machine snapshots",
         license="TBD",
-        encoding="TBD",
+        encoding="transliteration + panel drawings",
         primary_field=None,
         notes=STUB_REASONS["libyco_berber"],
     ),

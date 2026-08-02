@@ -8,7 +8,18 @@ one it can't).
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 
-from glyphos.data.ingest import CorpusMeta, cognates, coptic, hebrew, logogram, stubs, tla
+from glyphos.data.ingest import (
+    CorpusMeta,
+    cdli,
+    cognates,
+    coptic,
+    greek,
+    hebrew,
+    logogram,
+    meroitic,
+    stubs,
+    tla,
+)
 from glyphos.data.schema import Record
 
 
@@ -73,9 +84,26 @@ CORPORA: dict[str, CorpusSpec] = {
             inventory=logogram.inventory,
             schemes=(),
         ),
-        _stub_spec("greek_first1k"),
+        CorpusSpec(
+            name=greek.CORPUS,
+            meta=greek.meta,
+            parse=greek.parse,
+            schemes=("random", "document_heldout", "dedup"),
+        ),
+        CorpusSpec(
+            name=cdli.CORPUS,
+            meta=cdli.meta,
+            parse=cdli.parse,
+            schemes=("random", "document_heldout", "dedup", "period_heldout"),
+        ),
+        CorpusSpec(
+            name=meroitic.CORPUS,
+            meta=meroitic.meta,
+            parse=meroitic.parse,
+            # decipherment-target corpus: splits are made by the Phase 5 protocol
+            schemes=(),
+        ),
         _stub_spec("linear_b_damos"),
-        _stub_spec("meroitic_rem"),
         _stub_spec("mayan"),
         _stub_spec("libyco_berber"),
     ]

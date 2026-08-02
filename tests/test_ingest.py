@@ -126,7 +126,7 @@ def test_logogram_inventory(tmp_path):
 
 
 def test_stubs_raise_with_unblock_path():
-    for name in ("greek_first1k", "linear_b_damos", "meroitic_rem"):
+    for name in ("linear_b_damos", "mayan", "libyco_berber"):
         with pytest.raises(NotIngestable):
             stubs.parse_for(name)
 
@@ -141,6 +141,9 @@ def test_registry_is_complete_and_consistent():
         "ugaritic_hebrew_cognates",
         "linearb_greek_cognates",
         "logogram_nlp",
+        "greek_first1k",
+        "cuneiform_cdli",
+        "meroitic_rem",
     }
     for name, spec in CORPORA.items():
         meta = spec.meta()
@@ -173,6 +176,78 @@ def test_census_renders_pending_and_ingested(tmp_path):
     by_name = {r["corpus"]: r for r in census["rows"]}
     assert by_name["coptic_scriptorium"]["status"] == "ingested"
     assert by_name["tla_earlier_egyptian"]["status"] == "pending"
-    assert by_name["greek_first1k"]["status"] == "stub"
+    assert by_name["linear_b_damos"]["status"] == "stub"
     text = render_markdown(census)
-    assert "abc123def456" in text and "greek_first1k" in text
+    assert "abc123def456" in text and "linear_b_damos" in text
+
+
+# -- new-corpus parsers (greek / cdli / meroitic) ---------------------------
+
+
+GREEK_TEI = """<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+ <teiHeader><fileDesc><titleStmt><title>t</title></titleStmt></fileDesc></teiHeader>
+ <text><body><div type="edition">
+  <p>ἐν ἀρχῇ ἦν ὁ λόγος</p>
+  <p>too short</p>
+  <l>μῆνιν ἄειδε θεὰ Πηληϊάδεω</l>
+ </div></body></text>
+</TEI>
+"""
+
+
+def test_greek_parser(tmp_path):
+    from glyphos.data.ingest import greek
+
+    work = paths.data_root() / "greek_first1k/raw/First1KGreek/data/tlg0012/tlg001"
+    work.mkdir(parents=True)
+    (work / "tlg0012.tlg001.1st1K-grc1.xml").write_text(GREEK_TEI, encoding="utf-8")
+    (work / "tlg0012.tlg001.1st1K-eng1.xml").write_text(GREEK_TEI, encoding="utf-8")
+    recs = list(greek.parse())
+    # eng file skipped by filename; short/non-Greek <p> skipped by content
+    assert len(recs) == 2
+    assert recs[0].doc_id == "tlg0012.tlg001"
+    assert "λόγος" in recs[0].fields["text"]
+
+
+CDLI_ATF = """&P100001 = Test tablet A
+#atf: lang akk
+@tablet
+@obverse
+1. um-ma {d}utu-szi
+2. a-na be-li2-ia
+$ rest broken
+&P100002 = Test tablet B
+@tablet
+1. 1(disz) sila3 kasz
+"""
+
+
+def test_cdli_parser(tmp_path):
+    from glyphos.data.ingest import cdli
+
+    raw = paths.data_root() / "cuneiform_cdli/raw"
+    raw.mkdir(parents=True)
+    (raw / "cdliatf_unblocked.atf").write_text(CDLI_ATF, encoding="utf-8")
+    (raw / "cdli_cat.csv").write_text(
+        "id_text,language,period\nP100001,Akkadian,Old Babylonian\nP100002,Sumerian,Ur III\n",
+        encoding="utf-8",
+    )
+    recs = list(cdli.parse())
+    assert [r.doc_id for r in recs] == ["P100001", "P100002"]
+    assert recs[0].fields["text"] == "um-ma {d}utu-szi / a-na be-li2-ia"
+    assert recs[0].meta["language"] == "Akkadian"
+    assert recs[1].meta["period"] == "Ur III"
+
+
+def test_meroitic_parser(tmp_path):
+    from glyphos.data.ingest import meroitic
+
+    data = paths.data_root() / "meroitic_rem/raw/Meroitic-Corpus/Data"
+    data.mkdir(parents=True)
+    for name in meroitic.DOC_FILES.values():
+        (data / name).write_text("kiSri menEtel\n\nwES wetNyi\n", encoding="utf-8")
+    recs = list(meroitic.parse())
+    assert len(recs) == 2 * len(meroitic.DOC_FILES)
+    assert {r.doc_id for r in recs} == set(meroitic.DOC_FILES)
+    assert recs[0].fields["text"] == "kiSri menEtel"
