@@ -14,6 +14,41 @@
     "n_bytes": 3040958,
     "sha256": "9c3f422bcec2d5fe9c229adeb873818c8994e74c0172e149bae23ea1c716c95e"
   },
+  "cuneiform_cdli/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:44+00:00",
+    "n_bytes": 8595780,
+    "sha256": "1f6decac1b2fd8016f42f780032fb633139627c9e8b31016deeed3038674c5ce"
+  },
+  "cuneiform_cdli/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:44+00:00",
+    "n_bytes": 8969504,
+    "sha256": "013fee74dc892f1dabbac0febd5143f4dcc5a11a2c9c3faddf30dbf8b41788a5"
+  },
+  "cuneiform_cdli/splits/period_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:45+00:00",
+    "n_bytes": 12482170,
+    "sha256": "c24c20be45855f28ebd3fcde9baba8b123121dfeb8d02835615d438e02f2fead"
+  },
+  "cuneiform_cdli/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:45+00:00",
+    "n_bytes": 8588305,
+    "sha256": "13e388ac5c650862d0783ca5ded573baaa01103c2252c94180707b933d7ae9f2"
+  },
+  "greek_first1k/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:44+00:00",
+    "n_bytes": 49816923,
+    "sha256": "4172da5d7ba9d273684af825b5a6c2cdc8c51a382d04b4a3029e8d52c0e5683a"
+  },
+  "greek_first1k/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:44+00:00",
+    "n_bytes": 49964406,
+    "sha256": "5938060232a2ce44c5ae130eaff4a308bfaa9dbd7744e931fc4b81ce10335e88"
+  },
+  "greek_first1k/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T17:27:44+00:00",
+    "n_bytes": 37292223,
+    "sha256": "26b32ec9377eb0022fc43f00d06ef24380a6c71e2f76045af7753d0eb591c29c"
+  },
   "hebrew_morphhb/splits/dedup/v1/test/records.jsonl": {
     "frozen_at": "2026-08-02T04:34:24+00:00",
     "n_bytes": 1021318,
