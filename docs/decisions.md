@@ -116,3 +116,8 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   every split_info.json.
 - Long-running local steps run under `caffeinate -i` — system sleep froze a
   10-hour wall-clock job at 38 CPU-minutes; wall time is not compute time.
+- Compute policy extended (Waiz, 2026-08-02): the cluster is the default for
+  heavy CPU work too, not just GPU — SLURM CPU jobs (cpu.sbatch, 16 cores)
+  for data prep and rendering; GPU requests are typeless (any free card).
+  Cluster harness at scripts/cluster/ (sync, env bootstrap, job templates);
+  blocked only on one-time interactive key authorization.

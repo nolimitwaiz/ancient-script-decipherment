@@ -37,3 +37,6 @@ reports-check:
 
 check: lint test check-no-pretrained smoke
 	@echo "ALL CHECKS PASSED"
+
+cluster-sync:
+	bash scripts/cluster/sync.sh
