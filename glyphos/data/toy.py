@@ -55,9 +55,7 @@ def _word_types(rng: np.random.Generator, n_types: int, letter_probs: np.ndarray
     return words
 
 
-def generate_toy_corpus(
-    n_sentences: int, doc_size: int, n_word_types: int, seed: int
-) -> ToyCorpus:
+def generate_toy_corpus(n_sentences: int, doc_size: int, n_word_types: int, seed: int) -> ToyCorpus:
     rng = np.random.default_rng(seed)
     # Skewed letter distribution -> well-separated unigram frequencies, so the
     # frequency-rank baseline has a real (but imperfect) signal to exploit.
@@ -101,9 +99,7 @@ def split_by_document(
         "valid": set(doc_ids[n_train : n_train + n_valid]),
         "test": set(doc_ids[n_train + n_valid :]),
     }
-    splits = {
-        name: [s for s in sentences if s.doc_id in docs] for name, docs in assignment.items()
-    }
+    splits = {name: [s for s in sentences if s.doc_id in docs] for name, docs in assignment.items()}
     empty = [name for name, part in splits.items() if not part]
     if empty:
         raise ValueError(f"empty split partition(s) {empty}: corpus too small for {ratios}")

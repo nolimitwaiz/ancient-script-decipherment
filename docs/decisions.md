@@ -45,3 +45,15 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   pretrained model; also insensitive to the contextual distinctions we target.
 - Kendall tau implemented by hand (tau-a, O(n²) over configs) — avoids a scipy
   dependency before Phase 5 actually needs scipy for min-cost flow.
+
+## Post-Phase-0 (2026-08-01, same day)
+
+- Repo moved `~/dev/glyphos` → `~/Desktop/glyphos` — at Waiz's request.
+  Supersedes the off-iCloud placement rationale above; the caveat stands.
+- Incident during the move: the venv recreated on Desktop came up with every
+  file flagged macOS-hidden (`UF_HIDDEN`, likely an iCloud file-provider race
+  during folder ingestion); Python ≥3.12 silently skips hidden `.pth` files,
+  so the editable install vanished and pytest could not import `glyphos`.
+  Fix: `chflags -R nohidden .venv`; a second fresh `uv sync` produced zero
+  hidden files. Mitigation if it recurs: venv outside iCloud via
+  `UV_PROJECT_ENVIRONMENT`, or move the repo back.
