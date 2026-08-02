@@ -24,3 +24,21 @@ Format: status · gap · what exists instead · unblock path.
 
 - **RESOLVED 2026-08-01 · No TeX toolchain on the dev Mac.** Installed
   tectonic 0.17.0 to `~/.local/bin` (user-level, no admin).
+
+## Phase 1 additions (2026-08-02)
+
+- **OPEN · TLA text IDs.** Premium exports carry no text/document IDs and are
+  not text-ordered; doc-held-out uses dating cohorts (conservative). Unblock:
+  ask TLA maintainers for an export with text IDs (or map sentences via the
+  TLA web API), then mint new split tags.
+- **OPEN · LogogramNLP cuneiform/Akkadian absent** from the repo's data/
+  (only LNA/EGY/ZHO). Unblock: check the paper's release scripts for external
+  download links when building Phase 7 comparison hooks.
+- **OPEN · Coptic translation coverage.** text_en exists for only part of
+  SCRIPTORIUM; fine for known-relative use, insufficient for a Coptic MT task.
+- **RESOLVED 2026-08-02 · Ugaritic corpus provenance** — Luo et al.'s
+  NeuroDecipher release ships uga-heb cognate data (43,951 pairs) AND
+  linear_b-greek.cog (919 pairs): ladder rungs 1 and 2 both have their
+  published-comparison data. Full DĀMOS/LiBER corpus remains OPEN above.
+- **RESOLVED 2026-08-02 · Hebrew Bible export choice** — OpenScriptures
+  morphhb (WLC, CC BY 4.0); see decisions.

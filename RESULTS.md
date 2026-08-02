@@ -25,3 +25,17 @@ Guard audit: 1 locked-test read logged, attributed to the run. Regression
 floor asserted by `make smoke`: key_accuracy ≥ 0.5.
 
 ## Phase 1+ — (empty until the phase completes)
+
+## Phase 1 — corpus census & split integrity (data facts, not model results)
+
+Ingested (full table: docs/census/census.md): TLA Earlier Egyptian 12,773 /
+Late 3,606 / Demotic 13,383 parallel sentences (→German); Coptic SCRIPTORIUM
+52,105; Hebrew (WLC) 23,213 verses; Ugaritic–Hebrew 43,951 + Linear B–Greek
+919 cognate pairs; LogogramNLP inventoried. 19 test partitions frozen
+(configs/frozen_splits.json) and verified; guard enforces hash-on-read +
+write refusal.
+
+Contamination quantified — dedup (near-dup vs train, headline scheme) removed
+from test/valid: Earlier Egyptian 964/2,821 (~34%), Coptic 1,846, Demotic
+225, Late 62, Hebrew 59. Naive splits on this data overstate test size and
+inflate scores; headline numbers use `dedup` splits only.

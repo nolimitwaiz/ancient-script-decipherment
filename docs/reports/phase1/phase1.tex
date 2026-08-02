@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{parskip}
+
+% Bump on every substantive edit (phase1-v1 -> phase1-v2), then `make reports`.
+\newcommand{\ReportStamp}{phase1-v1}
+
+\title{GLYPHOS --- Phase 1 Report\\
+\large Data: Acquisition, Census, Frozen Splits}
+\author{Waiz Khan\\ \small JHU CLSP --- advisor: Philipp Koehn}
+\date{August 2, 2026 \quad {\small stamp: \ReportStamp}}
+
+\begin{document}
+\maketitle
+
+\section{Summary}
+Eight corpora ingested with provenance and content hashes; 19 test partitions
+frozen (SHA-256 manifest committed to git) and \emph{enforced} by the access
+guard; census committed and regenerable. No model training occurred: every
+step in this phase is download plus file processing (heaviest single step:
+Coptic deduplication, 15\,s of CPU). \texttt{make check} is green (lint, 80
+tests, no-pretrained gate, smoke).
+
+\section{Census}
+\begin{table}[h]\centering\small
+\begin{tabular}{lrrrll}
+\toprule
+corpus & sentences & docs & tokens & translation & source \\
+\midrule
+tla\_earlier\_egyptian & 12{,}773 & 95$^{1}$ & 70{,}267 & German & TLA (HF, CC-BY-SA-4.0) \\
+tla\_late\_egyptian    & 3{,}606  & 34$^{1}$ & 24{,}437 & German & TLA (HF, CC-BY-SA-4.0) \\
+tla\_demotic           & 13{,}383 & 130$^{1}$& 117{,}314& German & TLA (HF, CC-BY-SA-4.0) \\
+coptic\_scriptorium    & 52{,}105 & 1{,}490  & 736{,}585& En (partial) & C.\ SCRIPTORIUM \\
+hebrew\_morphhb        & 23{,}213 & 39       & 306{,}785& ---    & OpenScriptures WLC \\
+ugaritic\_hebrew\_cog. & 43{,}951 pairs & --- & ---     & ---    & NeuroDecipher \\
+linearb\_greek\_cog.   & 919 pairs & ---     & ---      & ---    & NeuroDecipher \\
+logogram\_nlp          & \multicolumn{3}{l}{inventory: LNA 165\,MB, EGY 10\,MB, ZHO 138\,MB} & --- & LogogramNLP \\
+\bottomrule
+\end{tabular}
+\caption{$^{1}$Dating cohorts, not true documents (\S3). Full machine-readable
+census: \texttt{docs/census/census.\{md,json\}}. Both decipherment-ladder
+rungs' cognate data come from Luo et al.'s own release --- rung 2 (Linear
+B$\to$Greek) is runnable without D\=AMOS.}
+\end{table}
+
+\section{TLA pseudo-documents (the honest caveat)}
+The official TLA exports carry no text IDs and are not text-ordered
+(contiguous same-date runs $\approx$ 1 sentence). \texttt{doc\_id} is
+therefore the \textbf{dating cohort}: all sentences sharing the exact
+(dateNotBefore, dateNotAfter, authors) triple. A real text's sentences always
+share these values, so no text can straddle partitions; cohorts over-merge
+(95/34/130 groups), which errs strict, never leaky. Obtaining real text IDs
+from the TLA maintainers is an open gap that would upgrade cohort-held-out to
+true document-held-out.
+
+\section{Splits and freezing}
+Seed 1234, ratios 80/10/10 by record weight over whole groups; every split
+ships \texttt{split\_info.json}; all 19 test partitions are SHA-256-frozen in
+the committed manifest. The guard now \emph{enforces} freezing: reading a
+frozen test file re-hashes it (tamper $\Rightarrow$ hard error) and write-mode
+opens of frozen files are refused --- tested in both directions.
+
+Headline scheme = \texttt{dedup}: cohort/document-held-out plus cross-split
+near-duplicate removal (normalized edit distance $\le 0.1$; exact-hash plus
+banded Levenshtein behind a bag-of-characters lower bound).
+
+\begin{table}[h]\centering\small
+\begin{tabular}{lrr}
+\toprule
+corpus & removed (exact + near) & test after dedup \\
+\midrule
+tla\_earlier\_egyptian & 857 + 107 & 718 \\
+tla\_late\_egyptian & 54 + 8 & 662 \\
+tla\_demotic & 171 + 54 & 1{,}283 \\
+hebrew\_morphhb & 50 + 9 & 3{,}227 \\
+coptic\_scriptorium & 1{,}597 + 249 & 4{,}541 \\
+\bottomrule
+\end{tabular}
+\caption{Dedup removals (always reported, never silent). Earlier Egyptian
+loses $\sim$34\% of naive test/valid to near-verbatim train overlap ---
+precisely the contamination mode that inflated published hieroglyph-MT
+results by 29--47 BLEU.}
+\end{table}
+
+Also materialized: \texttt{sign\_heldout} (25 mid-frequency sign types held
+out entirely; 197/335 test sentences for Earlier/Late), and
+\texttt{period\_heldout} (century buckets; Earlier + Demotic --- Late Egyptian
+has only 8 buckets and the scheme is dropped there with a note).
+\texttt{site\_heldout}: no Phase 1 corpus carries site metadata.
+\texttt{random} exists as a labeled diagnostic only.
+
+\section{Environment note}
+The Desktop/iCloud problem from Phase 0 \emph{recurred}: overnight, 6{,}760
+venv files were re-flagged macOS-hidden, which makes Python $\ge$3.12 skip
+\texttt{.pth} files and silently breaks imports. Durable fix: \texttt{.venv}
+is now a symlink to \texttt{\textasciitilde/.venvs/glyphos} (outside iCloud),
+matching \texttt{data $\to$ \textasciitilde/dev/glyphos-data}. No mutable tool
+state remains inside iCloud.
+
+\section{Next: Phase 2 --- rendering engine}
+PangoCairo + Noto (incl.\ Egyptian Hieroglyphs), 24$\times$24 windows with
+stride 12, the composable degradation suite with \texttt{damage\_level}, the
+multiscript self-supervised stream, and \texttt{<g>\dots</g>} sign-markup
+handling. Requires cairo/pango system libraries; install path for this
+machine decided at phase start.
+
+\vfill
+\noindent\rule{\linewidth}{0.4pt}\\
+{\small GLYPHOS Phase 1 report \(\cdot\) stamp \ReportStamp{} \(\cdot\)
+regenerate with \texttt{make reports}}
+\end{document}

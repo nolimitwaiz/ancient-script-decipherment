@@ -62,7 +62,7 @@ hand-rolled Sinkhorn (~100 lines, POT only as a test-time cross-check).
 
 ## Roadmap (details: docs/roadmap.md)
 
-Phase 0 scaffold/ledger ✅ → 1 data+census+frozen splits → 2 renderer+degradation
+Phase 0 scaffold/ledger ✅ → 1 data+census+frozen splits ✅ → 2 renderer+degradation
 → 3 models (pixel, BPE control, SSL pretrain, sealed LMs) → 4 translation+
 restoration+aux heads → 5 OT decipherment core+ladder → 6 quant layer →
 7 evaluation packaging+sweeps → 8 GUI/openbook scaffolds (deferred).

@@ -3,8 +3,8 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, experiment ledger, seeds, test-set guard, smoke, gates | ✅ done 2026-08-01 (docs/phase0.md) |
-| 1 | Data: TLA/Coptic/LogogramNLP/Ugaritic-Hebrew ingest, census, 6 split schemes, frozen+hashed tests | ⬜ next |
-| 2 | Render engine (PangoCairo/Noto, 24×24/12), degradation suite, multiscript SSL stream | ⬜ |
+| 1 | Data: TLA/Coptic/LogogramNLP/Ugaritic-Hebrew ingest, census, 6 split schemes, frozen+hashed tests | ✅ done 2026-08-02 (docs/phase1.md) |
+| 2 | Render engine (PangoCairo/Noto, 24×24/12), degradation suite, multiscript SSL stream | ⬜ next |
 | 3 | Models from scratch: pixel enc-dec (12/3, d512), BPE control, masked-window SSL, sealed char-LMs | ⬜ |
 | 4 | Tasks: Egyptian→German MT (chrF primary), Ithaca-style restoration + conformal sets, aux heads | ⬜ |
 | 5 | Decipherment core: Sinkhorn OT + min-cost flow, monotonicity/sparsity/freq + IPA + visual priors; ladder Ugaritic→Hebrew, Linear B→Greek, Egyptian→Coptic | ⬜ |

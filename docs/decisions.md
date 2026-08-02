@@ -57,3 +57,41 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   Fix: `chflags -R nohidden .venv`; a second fresh `uv sync` produced zero
   hidden files. Mitigation if it recurs: venv outside iCloud via
   `UV_PROJECT_ENVIRONMENT`, or move the repo back.
+
+## Phase 1 (2026-08-02)
+
+- iCloud venv breakage RECURRED (6,760 files re-flagged hidden overnight) —
+  correcting Phase 0's "did not recur" note. Durable fix: `.venv` is a symlink
+  to `~/.venvs/glyphos`; rule of thumb recorded: no mutable tool state inside
+  iCloud-managed paths.
+- Corpora live at `~/dev/glyphos-data` behind a repo-root `data` symlink —
+  keeps the data-dir contract intact on Mac and cluster while keeping bytes
+  off iCloud.
+- TLA doc_id = non-contiguous dating cohort (dateNotBefore, dateNotAfter,
+  authors) — exports have no text IDs and are not text-ordered (contiguous
+  date runs ≈ 1 sentence); cohorts over-merge, which errs strict for
+  held-out splitting, never leaky.
+- Hebrew Bible source = OpenScriptures morphhb (WLC) over ETCBC/BHSA —
+  trivially parseable OSIS XML, clean CC BY 4.0; BHSA's text-fabric adds a
+  dependency for no Phase 1 gain.
+- Ugaritic AND Linear B cognate data taken from Luo et al.'s NeuroDecipher
+  release — exact published-comparison data; rung 2 unblocked without DĀMOS.
+- LogogramNLP ingested inventory-only; its .pth pickles are never opened
+  (untrusted pickles); per-task parsing deferred to the Phase 7 hooks.
+- processed/ layout simplified to flat records.jsonl + manifest.json carrying
+  data_version (hash) — content-hash-named dirs were self-referential churn.
+- Dedup target field: translation side for parallel corpora, primary text for
+  monolingual ones (partial translations like Coptic text_en can't anchor
+  dedup).
+- Dedup candidate filter: numpy bag-of-characters L1/2 lower bound (a true
+  edit-distance lower bound → exact results) — Hebrew went from >10 min to
+  2.6 s.
+- tla_late_egyptian: period_heldout dropped (8 century buckets can't fill
+  3 partitions meaningfully); recorded in registry with comment.
+- sign_heldout: 25 sign types sampled from the 25–75% document-frequency band
+  (top signs would send everything to test; rare signs yield no test).
+- First1KGreek (~1 GB TEI) deferred to cluster-side ingest before Phase 3 —
+  needed only for the sealed Greek LM; stub + gap entry meanwhile.
+- Freeze manifest lives at configs/frozen_splits.json (committed) — data/ is
+  never committed, so split identity must live in git; guard enforces
+  hash-on-read and refuses write-mode opens of frozen files.
