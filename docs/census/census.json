@@ -1,0 +1,202 @@
+{
+  "rows": [
+    {
+      "corpus": "tla_earlier_egyptian",
+      "data_version": "62eace20bffb",
+      "documents": 95,
+      "encoding": "unicode hieroglyphs + transliteration",
+      "inventory": null,
+      "kind": "parallel",
+      "license": "CC-BY-SA-4.0",
+      "notes": "pseudo-documents = non-contiguous dating cohorts (dateNotBefore, dateNotAfter, authors); signs outside Unicode appear as <g>GardinerCode</g> markup",
+      "sentences": 12773,
+      "source": "https://huggingface.co/datasets/thesaurus-linguae-aegyptiae/tla-Earlier_Egyptian_original-v18-premium",
+      "status": "ingested",
+      "tokens_primary": 70267,
+      "translation": "de"
+    },
+    {
+      "corpus": "tla_late_egyptian",
+      "data_version": "a287ffa107c2",
+      "documents": 34,
+      "encoding": "unicode hieroglyphs + transliteration",
+      "inventory": null,
+      "kind": "parallel",
+      "license": "CC-BY-SA-4.0",
+      "notes": "pseudo-documents = non-contiguous dating cohorts (dateNotBefore, dateNotAfter, authors); signs outside Unicode appear as <g>GardinerCode</g> markup",
+      "sentences": 3606,
+      "source": "https://huggingface.co/datasets/thesaurus-linguae-aegyptiae/tla-late_egyptian-v19-premium",
+      "status": "ingested",
+      "tokens_primary": 24437,
+      "translation": "de"
+    },
+    {
+      "corpus": "tla_demotic",
+      "data_version": "08b86674d85a",
+      "documents": 130,
+      "encoding": "transliteration only",
+      "inventory": null,
+      "kind": "parallel",
+      "license": "CC-BY-SA-4.0",
+      "notes": "pseudo-documents = non-contiguous dating cohorts (dateNotBefore, dateNotAfter, authors); signs outside Unicode appear as <g>GardinerCode</g> markup",
+      "sentences": 13383,
+      "source": "https://huggingface.co/datasets/thesaurus-linguae-aegyptiae/tla-demotic-v18-premium",
+      "status": "ingested",
+      "tokens_primary": 117314,
+      "translation": "de"
+    },
+    {
+      "corpus": "coptic_scriptorium",
+      "data_version": "4444354f3147",
+      "documents": 1490,
+      "encoding": "unicode Coptic",
+      "inventory": null,
+      "kind": "monolingual",
+      "license": "CC-BY 4.0 (per corpus READMEs)",
+      "notes": "dialect inferred from directory name; token annotations not ingested in Phase 1",
+      "sentences": 52105,
+      "source": "https://github.com/CopticScriptorium/corpora",
+      "status": "ingested",
+      "tokens_primary": 736585,
+      "translation": "en (partial coverage)"
+    },
+    {
+      "corpus": "hebrew_morphhb",
+      "data_version": "ffee0c50b1e9",
+      "documents": 39,
+      "encoding": "unicode Hebrew (pointed, WLC)",
+      "inventory": null,
+      "kind": "monolingual",
+      "license": "CC BY 4.0",
+      "notes": "one record per verse; doc = book; lemma/morph annotations not ingested in Phase 1",
+      "sentences": 23213,
+      "source": "https://github.com/openscriptures/morphhb",
+      "status": "ingested",
+      "tokens_primary": 306785,
+      "translation": "-"
+    },
+    {
+      "corpus": "ugaritic_hebrew_cognates",
+      "data_version": "b555b738b83a",
+      "documents": 1,
+      "encoding": "transliteration (both sides)",
+      "inventory": null,
+      "kind": "cognate_pairs",
+      "license": "MIT (repository license; underlying lexica are published scholarship)",
+      "notes": "file uga-heb.no_spe.cog; fields src=uga, tgt=heb; '|' separates target variants; splits for the ladder are made in Phase 5 protocol",
+      "sentences": 43951,
+      "source": "https://github.com/j-luo93/NeuroDecipher (Luo, Cao & Barzilay 2019 release)",
+      "status": "ingested",
+      "tokens_primary": 43951,
+      "translation": "-"
+    },
+    {
+      "corpus": "linearb_greek_cognates",
+      "data_version": "5e3746066faf",
+      "documents": 1,
+      "encoding": "unicode Linear B glyphs vs Greek",
+      "inventory": null,
+      "kind": "cognate_pairs",
+      "license": "MIT (repository license; underlying lexica are published scholarship)",
+      "notes": "file linear_b-greek.cog; fields src=linear_b, tgt=greek; '|' separates target variants; splits for the ladder are made in Phase 5 protocol",
+      "sentences": 919,
+      "source": "https://github.com/j-luo93/NeuroDecipher (Luo, Cao & Barzilay 2019 release)",
+      "status": "ingested",
+      "tokens_primary": 919,
+      "translation": "-"
+    },
+    {
+      "corpus": "logogram_nlp",
+      "data_version": "inventory",
+      "documents": null,
+      "encoding": "mixed: images + per-task text/metadata",
+      "inventory": {
+        "EGY": {
+          "by_extension": {
+            ".json": 2,
+            ".png": 2337,
+            ".pth": 1
+          },
+          "bytes": 5101719,
+          "files": 2340
+        },
+        "LNA": {
+          "by_extension": {
+            ".json": 1,
+            ".png": 1533
+          },
+          "bytes": 169323943,
+          "files": 1534
+        },
+        "ZHO": {
+          "by_extension": {
+            ".ipynb": 2,
+            ".json": 7,
+            ".png": 15874,
+            ".txt": 2
+          },
+          "bytes": 118561514,
+          "files": 15885
+        }
+      },
+      "kind": "inventory",
+      "license": "unstated in repo (contact authors before redistribution)",
+      "notes": "inventory-only in Phase 1; task parsing lands with the Phase 7 comparison hooks; .pth pickles deliberately not opened",
+      "sentences": null,
+      "source": "https://github.com/taineleau/logogramNLP",
+      "status": "ingested",
+      "tokens_primary": null,
+      "translation": "-"
+    },
+    {
+      "corpus": "greek_first1k",
+      "encoding": "unicode polytonic Greek (TEI XML)",
+      "kind": "stub",
+      "license": "CC-BY-SA-4.0",
+      "notes": "First1KGreek (~1 GB TEI XML) is deliberately deferred to a cluster-side ingest before Phase 3 (sealed Greek LM); see docs/data_gaps.md",
+      "source": "https://github.com/OpenGreekAndLatin/First1KGreek",
+      "status": "stub",
+      "translation": "-"
+    },
+    {
+      "corpus": "linear_b_damos",
+      "encoding": "unicode Linear B",
+      "kind": "stub",
+      "license": "TBD",
+      "notes": "DAMOS/LiBER access method still unknown — loader interface reserved; Luo et al.'s Linear B-Greek cognate pairs ARE available as linearb_greek_cognates; see docs/data_gaps.md",
+      "source": "DAMOS (Oslo) / LiBER (CNR) — access TBD",
+      "status": "stub",
+      "translation": "-"
+    },
+    {
+      "corpus": "meroitic_rem",
+      "encoding": "transliteration",
+      "kind": "stub",
+      "license": "TBD",
+      "notes": "frontier target (REM), not a Phase 1 blocker",
+      "source": "Répertoire d'Épigraphie Méroïtique — access TBD",
+      "status": "stub",
+      "translation": "-"
+    },
+    {
+      "corpus": "mayan",
+      "encoding": "TBD",
+      "kind": "stub",
+      "license": "TBD",
+      "notes": "frontier target, not a Phase 1 blocker",
+      "source": "TBD",
+      "status": "stub",
+      "translation": "-"
+    },
+    {
+      "corpus": "libyco_berber",
+      "encoding": "TBD",
+      "kind": "stub",
+      "license": "TBD",
+      "notes": "frontier target, not a Phase 1 blocker",
+      "source": "TBD",
+      "status": "stub",
+      "translation": "-"
+    }
+  ]
+}

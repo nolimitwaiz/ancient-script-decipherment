@@ -1,0 +1,97 @@
+{
+  "coptic_scriptorium/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 2584929,
+    "sha256": "f59587be36f35c314c3a348ee1459ffd7d254034c08c3340768d33cb0528140f"
+  },
+  "coptic_scriptorium/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 3015923,
+    "sha256": "481214ed1d20de70933df15f4255e63579ac03703b46f79457ea668772dab43b"
+  },
+  "coptic_scriptorium/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 3040958,
+    "sha256": "9c3f422bcec2d5fe9c229adeb873818c8994e74c0172e149bae23ea1c716c95e"
+  },
+  "hebrew_morphhb/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 1021318,
+    "sha256": "31fa0300dcd496b7bafafdab9da9acb17801b7d68bd25832547d186d1da34287"
+  },
+  "hebrew_morphhb/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 1031447,
+    "sha256": "a02648f6ad66c6ec0efb76e69aacb30a0b0bde42abb19936115bd55eccd6f4f7"
+  },
+  "hebrew_morphhb/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 787762,
+    "sha256": "4336c72655b792b6e547f32e5f49e6b721036427ef3913d69f86316ac138ef69"
+  },
+  "tla_demotic/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 828394,
+    "sha256": "02335aaf2f15002df4b6d5e32ba20e7e81d5ea4edb1d6b5874d68ded0090590a"
+  },
+  "tla_demotic/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 901961,
+    "sha256": "0a0d780053d293c98a3b312b5d3bb31dae2d1ae6b06d4718dba245bc468550d9"
+  },
+  "tla_demotic/splits/period_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 1697659,
+    "sha256": "3ed950ed5d26b2c78570fe021cc5a84c1164f36b37811f8a84cdfb37f66926be"
+  },
+  "tla_demotic/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 886110,
+    "sha256": "53bb8b4b7569a4da4cac10cfe433ae37851e1d8548c5b5ce4852b805cd6a2ec2"
+  },
+  "tla_earlier_egyptian/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 340122,
+    "sha256": "e6a247ed1acbca44c167bc92274b5891ef8d2afadfb2b287136de1940b4b432a"
+  },
+  "tla_earlier_egyptian/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:24+00:00",
+    "n_bytes": 587486,
+    "sha256": "680d134e8b8e5fa421e45868ebca04f82df35449da1b934000c799efa7cc8091"
+  },
+  "tla_earlier_egyptian/splits/period_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 1118992,
+    "sha256": "b1a617777d1f90a7b55d9c8ed8dd209223126df5b83b51e51c5fc00fe4c97e6e"
+  },
+  "tla_earlier_egyptian/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 784854,
+    "sha256": "47df6e220eeca52381ef71b4f778e9ec768a49bd4ac8bbd6f04275ede9de5502"
+  },
+  "tla_earlier_egyptian/splits/sign_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 167018,
+    "sha256": "74d7e1900291b94cf205e373db94ebd48fa77d4c2bd5d498fb93f667406b5341"
+  },
+  "tla_late_egyptian/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 433507,
+    "sha256": "086416698ff0a32e8b40230fda37a2b0d9259f3181b10deac339d365e01a1600"
+  },
+  "tla_late_egyptian/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 462971,
+    "sha256": "431f53d8200bcc26d17a736755d6a7e14ff5d1e67b5723b4bcfe86f89e185ab6"
+  },
+  "tla_late_egyptian/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 232992,
+    "sha256": "c983c975cdb74a82bc8e6098ab802f59b97a27eb1ea7c85e998abf0ff2de4e18"
+  },
+  "tla_late_egyptian/splits/sign_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-02T04:34:25+00:00",
+    "n_bytes": 269491,
+    "sha256": "f32fd6aa56cdd62e4fbd9ec67569c1243226b561f4f7f9abed84c878162d3c4b"
+  }
+}
