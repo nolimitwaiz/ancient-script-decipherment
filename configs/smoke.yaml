@@ -1,0 +1,10 @@
+# GLYPHOS smoke pipeline (Phase 0). Deterministic; must finish in <5 min on CPU.
+seed: 1337
+n_sentences: 240
+doc_size: 8
+n_word_types: 40
+split_ratios:
+  train: 0.7
+  valid: 0.15
+  test: 0.15
+min_key_accuracy: 0.5
