@@ -1,5 +1,5 @@
 # environments
-.venv/
+.venv
 __pycache__/
 *.pyc
 *.egg-info/
@@ -11,7 +11,7 @@ __pycache__/
 htmlcov/
 
 # datasets are never committed; census hashes + manifests are (docs/, glyphos/)
-/data/
+/data
 
 # run artifacts: everything except the ledger (the ledger IS the record)
 runs/*

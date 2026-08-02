@@ -13,6 +13,7 @@ from glyphos.utils import runctx
 def _isolated_state(monkeypatch, tmp_path):
     monkeypatch.setenv("GLYPHOS_RUNS_DIR", str(tmp_path / "runs"))
     monkeypatch.setenv("GLYPHOS_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("GLYPHOS_FREEZE_MANIFEST", str(tmp_path / "frozen_splits.json"))
     monkeypatch.delenv("GLYPHOS_LEDGER_PATH", raising=False)
     monkeypatch.delenv("GLYPHOS_TEST_ACCESS_LOG", raising=False)
     runctx.clear_current_run()

@@ -89,11 +89,35 @@ def _is_read_mode(mode: str) -> bool:
     return "r" in mode or "+" in mode
 
 
+def _is_write_mode(mode: str) -> bool:
+    return any(c in mode for c in "wax+")
+
+
+_auditing = False
+
+
 def audit(file, mode: str = "r") -> None:
-    if isinstance(file, int):  # already-open fd — no path to classify
+    """Log test reads and enforce the freeze manifest (Phase 1).
+
+    The reentrancy latch matters: freeze verification hashes the file, which
+    opens it again through the patched open().
+    """
+    global _auditing
+    if _auditing or isinstance(file, int):  # fd opens have no path to classify
         return
-    if _is_read_mode(mode) and is_test_path(file):
-        _log_access(str(Path(os.fsdecode(file)).expanduser().resolve(strict=False)), mode)
+    if not is_test_path(file):
+        return
+    from glyphos.data import freeze  # deferred: keeps guard import-light for conftest
+
+    _auditing = True
+    try:
+        if _is_write_mode(mode):
+            freeze.check_write(file)
+        if _is_read_mode(mode):
+            _log_access(str(Path(os.fsdecode(file)).expanduser().resolve(strict=False)), mode)
+            freeze.check_read(file)
+    finally:
+        _auditing = False
 
 
 def guarded_open(file, mode: str = "r", *args, **kwargs):
