@@ -1,0 +1,2 @@
+# Append-only JSONL: union merge keeps every event when Mac and cluster both append.
+runs/ledger.jsonl merge=union

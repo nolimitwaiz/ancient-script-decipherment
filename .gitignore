@@ -1,0 +1,33 @@
+# environments
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# datasets are never committed; census hashes + manifests are (docs/, glyphos/)
+/data/
+
+# run artifacts: everything except the ledger (the ledger IS the record)
+runs/*
+!runs/ledger.jsonl
+
+# experiment tracking (wandb optional, off by default)
+wandb/
+
+# LaTeX intermediates (PDFs of reports ARE committed)
+docs/reports/**/*.aux
+docs/reports/**/*.log
+docs/reports/**/*.out
+docs/reports/**/*.toc
+docs/reports/**/*.fls
+docs/reports/**/*.fdb_latexmk
+docs/reports/**/*.synctex.gz
+
+# macOS
+.DS_Store
