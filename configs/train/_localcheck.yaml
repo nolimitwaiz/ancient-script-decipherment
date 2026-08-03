@@ -1,0 +1,13 @@
+# Pipeline validation ONLY: micro model, 20 steps, seconds of CPU.
+# Never a source of numbers — family name says so.
+task: char_lm
+corpora: [hebrew_morphhb]
+scheme: dedup
+family: localcheck-pipeline
+hypothesis: train.py wiring works end to end on real frozen splits (no science).
+lm_d_model: 32
+lm_layers: 2
+kill_gate_steps: 20
+batch_sentences: 8
+max_src_len: 64
+lm_n_heads: 2

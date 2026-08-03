@@ -1,0 +1,14 @@
+# Sealed Hebrew char-LM (docs/sealed_models.md) — known relative for Ugaritic rung
+task: char_lm
+corpora: [hebrew_morphhb]
+scheme: dedup
+family: sealed-lm-hebrew
+hypothesis: >
+  A 6-layer d384 char-LM trained from scratch on WLC Hebrew reaches
+  substantially better held-out cross-entropy than a unigram baseline,
+  giving the Phase 5 Ugaritic rung a usable plausibility scorer.
+lm_d_model: 384
+lm_layers: 6
+max_steps: 40000
+batch_sentences: 96
+eval_every: 1000

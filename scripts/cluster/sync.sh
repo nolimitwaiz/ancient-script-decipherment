@@ -10,14 +10,14 @@ repo_dir="$(cd "$(dirname "$0")/../.." && pwd)"
 data_dir="$(cd "$repo_dir/data" && pwd -P)"   # resolves the symlink
 
 echo "[sync] repo -> ${user}@${host}:${root}"
-rsync -az --info=stats1 \
+rsync -az --stats \
     --exclude '.git/' --exclude '.venv' --exclude 'data' \
     --exclude 'runs/smoke/' --exclude '__pycache__' --exclude '.pytest_cache' \
     --exclude '.ruff_cache' \
     "$repo_dir/" "${user}@${host}:${root}/"
 
 echo "[sync] data (${data_dir}) -> ${user}@${host}:${root}-data"
-rsync -az --info=stats1 \
+rsync -az --stats \
     --exclude '_hf_cache/' \
     "$data_dir/" "${user}@${host}:${root}-data/"
 

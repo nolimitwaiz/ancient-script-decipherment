@@ -1,0 +1,16 @@
+# The control: BPE seq2seq, Earlier Egyptian -> German, headline dedup split
+task: translation_bpe
+corpora: [tla_earlier_egyptian]
+scheme: dedup
+family: mt-tla-earlier-bpe
+src_field: transliteration
+hypothesis: >
+  The BPE control on 10k parallel sentences learns a nontrivial
+  Egyptian->German mapping (eval CE well below initialization); its ceiling
+  anchors the pixel-vs-BPE comparison.
+enc_layers: 6
+dec_layers: 6
+ff: 1024
+max_steps: 30000
+batch_sentences: 48
+grad_accum: 8

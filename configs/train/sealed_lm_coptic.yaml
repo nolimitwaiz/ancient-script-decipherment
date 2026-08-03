@@ -1,0 +1,11 @@
+task: char_lm
+corpora: [coptic_scriptorium]
+scheme: dedup
+family: sealed-lm-coptic
+hypothesis: >
+  A from-scratch char-LM on Coptic SCRIPTORIUM converges and serves as the
+  Egyptian->Coptic rung's plausibility scorer.
+lm_d_model: 384
+lm_layers: 6
+max_steps: 40000
+batch_sentences: 96

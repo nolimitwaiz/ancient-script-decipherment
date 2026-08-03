@@ -1,0 +1,13 @@
+# The headline model: pixel windows over rendered hieroglyphs -> German
+task: translation_pixel
+corpora: [tla_earlier_egyptian]
+scheme: dedup
+family: mt-tla-earlier-pixel
+src_field: hieroglyphs
+hypothesis: >
+  The pixel encoder-decoder matches or beats the BPE control on the dedup
+  split at matched parameters (Salesky-style pixel advantage carries to
+  hieroglyphic input).
+max_steps: 60000
+batch_sentences: 32
+grad_accum: 12

@@ -1,0 +1,11 @@
+task: char_lm
+corpora: [greek_first1k]
+scheme: dedup
+family: sealed-lm-greek
+hypothesis: >
+  A from-scratch char-LM on First1KGreek converges to a held-out
+  cross-entropy usable as the Linear B rung's Greek plausibility scorer.
+lm_d_model: 384
+lm_layers: 6
+max_steps: 60000
+batch_sentences: 96
