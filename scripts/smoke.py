@@ -21,6 +21,7 @@ if "GLYPHOS_DATA_ROOT" not in os.environ:
 
 from glyphos.ledger import Ledger
 from glyphos.ledger.report import build_reports, format_report
+from glyphos.tasks.model_smoke import ModelSmokeConfig, ModelSmokeFailure, run_model_smoke
 from glyphos.tasks.smoke import SmokeConfig, SmokeFailure, run_smoke
 from glyphos.utils.config import load_config
 
@@ -34,7 +35,9 @@ def main(argv: list[str] | None = None) -> int:
     cfg = load_config(SmokeConfig, args.config)
     try:
         run_smoke(cfg)
-    except SmokeFailure as exc:
+        print("\n[smoke] model families (50 CPU steps each):")
+        run_model_smoke(ModelSmokeConfig())
+    except (SmokeFailure, ModelSmokeFailure) as exc:
         print(f"[smoke] FAIL: {exc}", file=sys.stderr)
         return 1
 
