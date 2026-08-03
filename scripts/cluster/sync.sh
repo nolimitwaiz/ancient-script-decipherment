@@ -4,7 +4,7 @@
 # the HF cache is excluded (regenerable).
 set -euo pipefail
 host="${GLYPHOS_CLUSTER_HOST:-your-cluster-login-host}"
-user="${GLYPHOS_CLUSTER_USER:-$(whoami)}"
+user="${GLYPHOS_CLUSTER_USER:-your-username}"
 root="${GLYPHOS_CLUSTER_ROOT:-glyphos}"   # relative to remote $HOME unless absolute
 repo_dir="$(cd "$(dirname "$0")/../.." && pwd)"
 data_dir="$(cd "$repo_dir/data" && pwd -P)"   # resolves the symlink
