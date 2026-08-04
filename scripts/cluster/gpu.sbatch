@@ -21,4 +21,6 @@ cd "${GLYPHOS_CLUSTER_ROOT:-$HOME/glyphos}"
 mkdir -p runs
 echo "[job $SLURM_JOB_ID] $(hostname) gpus=${CUDA_VISIBLE_DEVICES:-none} :: $*"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null || true
+# No silent fallbacks: a GPU job that cannot see CUDA must die, not train on CPU.
+uv run python -c "import torch; assert torch.cuda.is_available(), 'CUDA unavailable on this node/driver'" || exit 1
 exec "$@"
