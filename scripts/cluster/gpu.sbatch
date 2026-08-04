@@ -17,6 +17,7 @@
 
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
+export PYTHONUNBUFFERED=1
 cd "${GLYPHOS_CLUSTER_ROOT:-$HOME/glyphos}"
 mkdir -p runs
 echo "[job $SLURM_JOB_ID] $(hostname) gpus=${CUDA_VISIBLE_DEVICES:-none} :: $*"
