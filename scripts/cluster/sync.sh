@@ -23,4 +23,8 @@ rsync -az --stats \
 
 echo "[sync] linking data dir on cluster"
 ssh "${user}@${host}" "cd ${root} && ln -sfn ../${root}-data data && ls -la data"
-echo "[sync] done"
+echo "[sync] pulling cluster ledger shards"
+mkdir -p "$repo_dir/runs/ledger.d"
+rsync -az --ignore-existing \
+    "${user}@${host}:${root}/runs/ledger.d/" "$repo_dir/runs/ledger.d/" 2>/dev/null || true
+echo "[sync] done (run 'uv run glyphos-ledger compact' to fold shards in)"

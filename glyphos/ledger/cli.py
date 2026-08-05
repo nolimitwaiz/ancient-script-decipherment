@@ -44,6 +44,13 @@ def _cmd_show(ledger: Ledger, args: argparse.Namespace) -> int:
     return 1
 
 
+def _cmd_compact(ledger: Ledger, _args: argparse.Namespace) -> int:
+    """Fold per-run shards into the canonical ledger (run after cluster jobs)."""
+    n = ledger.compact()
+    print(f"compacted {n} event(s) into {ledger.path}")
+    return 0
+
+
 def _cmd_register(ledger: Ledger, args: argparse.Namespace) -> int:
     run_id = ledger.register(
         hypothesis=args.hypothesis,
@@ -77,6 +84,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("report", help="per-family multiple-testing report")
+    sub.add_parser("compact", help="fold per-run shards into the canonical ledger")
 
     p_list = sub.add_parser("list", help="list runs")
     p_list.add_argument("--family")
@@ -109,6 +117,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 _COMMANDS = {
     "report": _cmd_report,
+    "compact": _cmd_compact,
     "list": _cmd_list,
     "show": _cmd_show,
     "register": _cmd_register,

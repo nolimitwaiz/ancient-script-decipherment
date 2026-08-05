@@ -58,6 +58,7 @@ def test_complete_merges_and_is_append_only():
     assert rec.status == "completed"
     assert rec.all_metrics == {"acc": 0.9}
     # two physical lines: register + complete, nothing rewritten
+    ledger.compact()  # events land in the run's shard until compacted
     lines = [json.loads(line) for line in ledger.path.read_text().splitlines() if line.strip()]
     assert [e["event"] for e in lines] == ["register", "complete"]
 
@@ -114,3 +115,66 @@ def test_corrupt_line_is_a_hard_error(tmp_path):
         f.write("{not json\n")
     with pytest.raises(LedgerError, match="corrupt"):
         ledger.load()
+
+
+def test_concurrent_runs_do_not_lose_events(tmp_path):
+    """Regression: SSL kill-gate 1709903 lost its registration when six SLURM
+    jobs appended to one NFS file. Each run now owns a shard."""
+    import multiprocessing as mp
+
+    ledger_path = tmp_path / "ledger.jsonl"
+
+    def worker(i):
+        led = Ledger(ledger_path)
+        with led.run(
+            hypothesis=f"concurrent run {i}",
+            phase="phase3",
+            family="concurrency",
+            config_hash=f"cfg{i}",
+            data_version="d",
+            split_version="s",
+            seed=i,
+            selection_metric="acc",
+            git_hash="abc123",
+        ) as run:
+            run.log_metric("acc", 0.1 * i)
+
+    ctx = mp.get_context("fork")
+    procs = [ctx.Process(target=worker, args=(i,)) for i in range(8)]
+    for p in procs:
+        p.start()
+    for p in procs:
+        p.join(timeout=30)
+
+    records = Ledger(ledger_path).load()
+    assert len(records) == 8, f"lost events: only {len(records)} of 8 runs survived"
+    assert all(r.status == "completed" for r in records)
+    assert {r.seed for r in records} == set(range(8))
+
+
+def test_compact_folds_shards_into_canonical_file(tmp_path):
+    ledger_path = tmp_path / "ledger.jsonl"
+    led = Ledger(ledger_path)
+    run_id = _register(led)
+    led.complete(run_id, "completed", {"acc": 0.5})
+    assert led.shard_dir.exists() and list(led.shard_dir.glob("*.jsonl"))
+
+    merged = led.compact()
+    assert merged == 2  # register + complete
+    assert not list(led.shard_dir.glob("*.jsonl"))
+    [rec] = Ledger(ledger_path).load()
+    assert rec.status == "completed" and rec.all_metrics == {"acc": 0.5}
+    assert led.compact() == 0  # idempotent
+
+
+def test_load_tolerates_event_present_in_both_file_and_shard(tmp_path):
+    ledger_path = tmp_path / "ledger.jsonl"
+    led = Ledger(ledger_path)
+    run_id = _register(led)
+    led.complete(run_id, "completed", {"acc": 1.0})
+    shard = next(led.shard_dir.glob("*.jsonl"))
+    lines = shard.read_text()
+    with open(ledger_path, "a") as f:  # duplicate every event into the main file
+        f.write(lines)
+    [rec] = Ledger(ledger_path).load()  # must not raise "duplicate register"
+    assert rec.status == "completed"

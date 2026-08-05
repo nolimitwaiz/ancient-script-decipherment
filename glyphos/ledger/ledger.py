@@ -103,25 +103,35 @@ class Ledger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
     # -- storage ------------------------------------------------------------
+    #
+    # Concurrency: SLURM runs many jobs at once against a shared NFS home, and
+    # flock() over NFS does not hold — appending every event to one file LOST a
+    # registration (SSL kill-gate 1709903, 2026-08-05). Each run therefore
+    # writes its own shard, `runs/ledger.d/<run_id>.jsonl`, and readers merge
+    # the canonical file with every shard. `compact()` folds shards back into
+    # ledger.jsonl for a tidy git history. One writer per file, always.
+
+    @property
+    def shard_dir(self) -> Path:
+        return self.path.parent / (self.path.stem + ".d")
+
+    def _shard_path(self, run_id: str) -> Path:
+        return self.shard_dir / f"{run_id}.jsonl"
 
     def _append(self, event: dict) -> None:
         line = json.dumps(event, sort_keys=True, ensure_ascii=False)
-        with open(self.path, "a", encoding="utf-8") as f:
-            try:
-                import fcntl
+        target = self._shard_path(event["run_id"])
+        target.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+        try:
+            os.write(fd, (line + "\n").encode("utf-8"))
+            os.fsync(fd)
+        finally:
+            os.close(fd)
 
-                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            except ImportError:  # non-POSIX; single-writer assumption holds
-                pass
-            f.write(line + "\n")
-            f.flush()
-            os.fsync(f.fileno())
-
-    def _events(self) -> list[dict]:
-        if not self.path.exists():
-            return []
+    def _read_jsonl(self, path: Path) -> list[dict]:
         events = []
-        with open(self.path, encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             for lineno, line in enumerate(f, start=1):
                 if not line.strip():
                     continue
@@ -129,10 +139,41 @@ class Ledger:
                     events.append(json.loads(line))
                 except json.JSONDecodeError as exc:
                     raise LedgerError(
-                        f"{self.path}:{lineno}: corrupt ledger line ({exc}); "
+                        f"{path}:{lineno}: corrupt ledger line ({exc}); "
                         "the ledger is append-only — investigate, do not repair silently"
                     ) from exc
         return events
+
+    def _events(self) -> list[dict]:
+        events: list[dict] = []
+        if self.path.exists():
+            events.extend(self._read_jsonl(self.path))
+        if self.shard_dir.is_dir():
+            for shard in sorted(self.shard_dir.glob("*.jsonl")):
+                events.extend(self._read_jsonl(shard))
+        return events
+
+    def compact(self) -> int:
+        """Fold shard files into the canonical ledger; returns events merged."""
+        if not self.shard_dir.is_dir():
+            return 0
+        shards = sorted(self.shard_dir.glob("*.jsonl"))
+        if not shards:
+            return 0
+        known = set()
+        if self.path.exists():
+            known = {line.strip() for line in self.path.read_text(encoding="utf-8").splitlines()}
+        merged = 0
+        with open(self.path, "a", encoding="utf-8") as out:
+            for shard in shards:
+                for line in shard.read_text(encoding="utf-8").splitlines():
+                    if line.strip() and line.strip() not in known:
+                        out.write(line.strip() + "\n")
+                        known.add(line.strip())
+                        merged += 1
+        for shard in shards:
+            shard.unlink()
+        return merged
 
     # -- write API ----------------------------------------------------------
 
@@ -239,41 +280,54 @@ class Ledger:
     # -- read API -----------------------------------------------------------
 
     def load(self) -> list[RunRecord]:
+        """Merge every event into run records. Two passes (registers, then
+        completes) so shard interleaving cannot make a run look unregistered."""
         records: dict[str, RunRecord] = {}
-        for e in self._events():
-            kind = e.get("event")
-            if kind == "register":
-                if e["run_id"] in records:
-                    raise LedgerError(f"duplicate register event for run {e['run_id']}")
-                records[e["run_id"]] = RunRecord(
-                    run_id=e["run_id"],
-                    registered_at=e["timestamp"],
-                    git_hash=e["git_hash"],
-                    hypothesis=e["hypothesis"],
-                    phase=e["phase"],
-                    family=e["family"],
-                    config_hash=e["config_hash"],
-                    data_version=e["data_version"],
-                    split_version=e["split_version"],
-                    seed=e["seed"],
-                    selection_metric=e["selection_metric"],
-                    n_variants_tried_so_far_in_this_family=e[
-                        "n_variants_tried_so_far_in_this_family"
-                    ],
-                    notes=e.get("notes", ""),
-                )
-            elif kind == "complete":
-                rec = records.get(e["run_id"])
-                if rec is None:
-                    raise LedgerError(f"complete event for unknown run {e['run_id']}")
-                rec.status = e["status"]
-                rec.all_metrics = e.get("all_metrics", {})
-                rec.completed_at = e["timestamp"]
-                if e.get("notes"):
-                    rec.notes = f"{rec.notes} | {e['notes']}" if rec.notes else e["notes"]
-            else:
-                raise LedgerError(f"unknown ledger event type {kind!r}")
+        events = self._events()
+        for kind_pass in ("register", "complete"):
+            for e in events:
+                kind = e.get("event")
+                if kind not in ("register", "complete"):
+                    raise LedgerError(f"unknown ledger event type {kind!r}")
+                if kind != kind_pass:
+                    continue
+                self._apply_event(records, e)
         return list(records.values())
+
+    @staticmethod
+    def _apply_event(records: dict[str, RunRecord], e: dict) -> None:
+        if e["event"] == "register":
+            existing = records.get(e["run_id"])
+            if existing is not None:
+                if existing.registered_at == e["timestamp"]:
+                    return  # same event present in both the canonical file and a shard
+                raise LedgerError(f"duplicate register event for run {e['run_id']}")
+            records[e["run_id"]] = RunRecord(
+                run_id=e["run_id"],
+                registered_at=e["timestamp"],
+                git_hash=e["git_hash"],
+                hypothesis=e["hypothesis"],
+                phase=e["phase"],
+                family=e["family"],
+                config_hash=e["config_hash"],
+                data_version=e["data_version"],
+                split_version=e["split_version"],
+                seed=e["seed"],
+                selection_metric=e["selection_metric"],
+                n_variants_tried_so_far_in_this_family=e["n_variants_tried_so_far_in_this_family"],
+                notes=e.get("notes", ""),
+            )
+            return
+        rec = records.get(e["run_id"])
+        if rec is None:
+            raise LedgerError(f"complete event for unknown run {e['run_id']}")
+        if rec.completed_at == e["timestamp"]:
+            return  # duplicate of the same terminal event (file + shard)
+        rec.status = e["status"]
+        rec.all_metrics = e.get("all_metrics", {})
+        rec.completed_at = e["timestamp"]
+        if e.get("notes"):
+            rec.notes = f"{rec.notes} | {e['notes']}" if rec.notes else e["notes"]
 
     def families(self) -> dict[str, list[RunRecord]]:
         out: dict[str, list[RunRecord]] = {}
