@@ -294,10 +294,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", required=True)
     parser.add_argument("--kill-gate", action="store_true", help="cap at kill_gate_steps")
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="override config seed (headline numbers need >=3 distinct seeds)",
+    )
     args = parser.parse_args(argv)
 
     install_guard()
     cfg = load_config(TrainRunConfig, args.config)
+    if args.seed is not None:
+        cfg = dataclasses.replace(cfg, seed=args.seed)
     set_seed(cfg.seed)
     max_steps = cfg.kill_gate_steps if args.kill_gate else cfg.max_steps
 

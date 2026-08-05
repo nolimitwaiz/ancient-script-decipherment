@@ -46,3 +46,21 @@ greek_first1k 392,478 passages / 28.8M tokens; cuneiform_cdli 132,210
 tablets / 8.9M tokens (language+period metadata); meroitic_rem 18,103 lines
 (first machine-readable Meroitic corpus). 26 frozen test partitions total,
 all verified. Exact-dedup removals: Greek 617, CDLI 1,891.
+
+## Phase 3 — trained models (CLSP, 2026-08-04/05)
+
+All early-stopped on held-out cross-entropy; all preregistered in the ledger.
+
+| model | run family | steps | best held-out CE |
+|---|---|---|---|
+| Hebrew sealed char-LM | sealed-lm-hebrew | 13,000 | 1.5109 |
+| Coptic sealed char-LM | sealed-lm-coptic | 15,000 | 1.2582 |
+| Greek sealed char-LM | sealed-lm-greek | 42,000 | 1.5994 |
+| BPE translation control (Egy→De) | mt-tla-earlier-bpe | 12,000 | 5.5635 |
+
+NOT YET headline-grade: single seed each (headline requires ≥3) and no test-set
+evaluation has been run — these are valid/held-out numbers only. The frozen
+test partitions remain untouched, as designed.
+
+Pixel-model kill-gate (200 steps, run 1709819): eval CE 6.3034 — pipeline
+proven on GPU; full 3-seed runs pending.
