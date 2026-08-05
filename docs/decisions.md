@@ -131,3 +131,15 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   does NOT scan ~/Library/Fonts. All six target scripts confirmed rendering
   ink at 10pt. Open item: unify render env with the uv venv (two interpreters
   is temporary; cluster setup will install pycairo against system cairo).
+
+## Phase 3/7 planning (2026-08-05)
+
+- SSL objective = masked-window reconstruction (MAE family) for the headline:
+  exact from-scratch analog of PIXEL/ViT-MAE (the LogogramNLP comparison),
+  and pixel-level detail IS the signal for glyphs. JEPA-style latent
+  prediction and DINO-style self-distillation (both implemented from scratch)
+  are queued as Phase 7 ablation arms — objectives are unconstrained, weights
+  are not.
+- DINOv2/v3 CHECKPOINTS are banned from the sealed pipeline (web-pretrained =
+  lookahead contamination; CI gate enforces). Permitted one day only as an
+  explicitly-labeled open-book comparison in contrib/openbook/ (Phase 8).
