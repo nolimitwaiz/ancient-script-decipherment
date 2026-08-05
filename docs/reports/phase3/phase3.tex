@@ -1,0 +1,99 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{parskip}
+
+% Bump on every substantive edit, then `make reports`.
+\newcommand{\ReportStamp}{phase3-v1}
+
+\title{GLYPHOS --- Phase 3 Report\\
+\large From-Scratch Model Stack, Trained on CLSP}
+\author{Waiz Khan\\ \small JHU CLSP --- advisor: Philipp Koehn}
+\date{August 5, 2026 \quad {\small stamp: \ReportStamp}}
+
+\begin{document}
+\maketitle
+
+\section{Summary}
+Four model families were implemented from scratch, smoke-verified on CPU, and
+trained for real on cluster GPUs: a sealed character LM, a BPE
+encoder--decoder translation control, the pixel encoder--decoder, and
+masked-window self-supervised pretraining. Every parameter was randomly
+initialized and trained inside this repository; the no-pretrained CI gate
+guards the sealed tree. The full-size pixel model is $\sim$97M parameters,
+inside the 50--400M target band.
+
+\section{Trained models}
+\begin{table}[h]\centering\small
+\begin{tabular}{llrrr}
+\toprule
+model & family & steps & wall & best held-out CE \\
+\midrule
+Hebrew sealed char-LM & sealed-lm-hebrew & 13{,}000 & $\sim$4\,h & \textbf{1.5109} \\
+Coptic sealed char-LM & sealed-lm-coptic & 15{,}000 & $\sim$5\,h & \textbf{1.2582} \\
+Greek sealed char-LM  & sealed-lm-greek  & 42{,}000 & 21.4\,h & \textbf{1.5994} \\
+BPE control (Egy$\to$De) & mt-tla-earlier-bpe & 12{,}000 & 9.7\,h & \textbf{5.5635} \\
+\bottomrule
+\end{tabular}
+\caption{All runs early-stopped on held-out cross-entropy and preregistered in
+the ledger. These are \emph{not} headline numbers: one seed each, and no
+frozen test partition has been read. The three sealed LMs ($\sim$10.7M params
+each) are the only language models the decipherment track may consume.}
+\end{table}
+
+The pixel kill-gate (run 1709819, 200 steps) reached held-out CE 6.3034 after
+rendering TLA hieroglyphs to pixels on a compute node --- the first end-to-end
+GPU execution of the project's central mechanism. The BPE control's converged
+5.5635 is the line the pixel model must beat, at three seeds, before anything
+is claimed.
+
+\section{Architecture}
+Pre-LayerNorm Transformer blocks with sinusoidal positions and the Salesky
+configuration (12 encoder / 3 decoder layers, $d=512$, FF 4096, 4 heads). The
+pixel front end embeds each $24\times24$ window (Conv2D $3\times3$
+$\rightarrow$ BatchNorm $\rightarrow$ ReLU $\rightarrow$ linear projection);
+the BPE control swaps in a source embedding matrix and shares everything else,
+so the comparison is architecture-matched by construction. Target subwords come
+from a SentencePiece \emph{trainer} run on our own corpora. The training loop
+is explicit PyTorch: Adam with linear warmup then inverse-sqrt decay, gradient
+accumulation, clipping, bf16 autocast on CUDA with fp32 fallback, DDP wrapping
+from the SLURM environment, early stopping, and rank-0 checkpointing.
+
+Self-supervised pretraining uses masked-window reconstruction (MAE family) ---
+chosen as the exact from-scratch analog of the pretrained PIXEL model used by
+the published LogogramNLP baseline, and because stroke-level detail is the
+signal for writing. JEPA-style latent prediction and DINO-style
+self-distillation, implemented from scratch, are queued as Phase~7 ablations;
+pretrained DINOv2/v3 \emph{checkpoints} remain banned from the sealed pipeline
+and are permitted only as labeled open-book comparisons (Phase~8).
+
+\section{What the kill-gates caught}
+The mandatory one-budget-unit runs found four real defects, each costing
+seconds instead of hours:
+\begin{enumerate}
+  \item torch 2.13 silently fell back to CPU on older cluster drivers (49
+        minutes of fake ``GPU'' training). Linux now pins torch 2.4.1+cu118,
+        which runs on every driver generation in the fleet.
+  \item GPU jobs now assert \texttt{torch.cuda.is\_available()} before
+        launching --- no silent CPU training, ever.
+  \item Node \texttt{c04} throws \texttt{CUDA unknown error} on contact and is
+        excluded from all jobs.
+  \item Paragraph-length Greek asked cairo for a surface wider than it will
+        allocate; \texttt{render\_strip} now truncates to the window budget
+        before allocating (no information lost --- \texttt{slice\_windows}
+        already caps at \texttt{max\_windows}). Regression test added.
+\end{enumerate}
+
+\section{Next: Phase 4}
+chrF-primary translation metrics, Ithaca-style restoration with damage-shaped
+masks from the Phase~2 degradation suite, conformal candidate sets with
+measured coverage, and the auxiliary heads --- the first evaluations to touch
+the frozen test partitions.
+
+\vfill
+\noindent\rule{\linewidth}{0.4pt}\\
+{\small GLYPHOS Phase 3 report \(\cdot\) stamp \ReportStamp{} \(\cdot\)
+regenerate with \texttt{make reports}}
+\end{document}
