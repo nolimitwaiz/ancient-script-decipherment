@@ -14,6 +14,7 @@
 #SBATCH --mem=48G
 #SBATCH --time=24:00:00
 #SBATCH --output=runs/slurm-%j.out
+#SBATCH --exclude=c04  # black-hole node: GPU throws "CUDA unknown error" (2 kill-gates eaten)
 
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
