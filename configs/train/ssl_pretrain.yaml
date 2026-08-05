@@ -1,0 +1,15 @@
+# Masked-window SSL pretraining (§3.3) — the from-scratch substitute for
+# pretrained pixel models. Renders TLA hieroglyphs + Coptic + Hebrew + Greek.
+task: ssl
+corpora: [tla_earlier_egyptian, tla_late_egyptian, coptic_scriptorium, hebrew_morphhb, greek_first1k]
+scheme: dedup
+family: ssl-pretrain-multiscript
+hypothesis: >
+  Masked-window reconstruction over the multiscript render stream learns
+  transferable stroke features: warm-starting the pixel translator from this
+  encoder improves its held-out CE versus random init at equal steps.
+max_steps: 80000
+batch_sentences: 24
+grad_accum: 4
+eval_every: 1000000
+max_src_len: 128

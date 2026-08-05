@@ -233,16 +233,44 @@ def build_ssl(cfg, train_recs, valid_recs, run_dir):
     from glyphos.render.renderer import SCRIPT_FONTS
 
     rcfg = RenderConfig()
-    fld = cfg.src_field or _manifest(cfg.corpora[0])["primary_field"]
-    texts = _texts(train_recs, fld)
-    encode = _window_batcher(None, cfg, rcfg, SCRIPT_FONTS["default"])
+
+    # per-record font: hieroglyphic corpora render with the Egyptian font,
+    # everything else with the default (Pango falls back per script anyway)
+    def _font_for(corpus: str) -> str:
+        if corpus.startswith("tla"):
+            return SCRIPT_FONTS["egyptian"]
+        for key in ("coptic", "linear_b", "cuneiform", "meroitic"):
+            if key in corpus:
+                return SCRIPT_FONTS.get(key, SCRIPT_FONTS["default"])
+        return SCRIPT_FONTS["default"]
+
+    items = []
+    for rec in train_recs:
+        fld = cfg.src_field or _manifest(rec.corpus)["primary_field"]
+        if fld in rec.fields and rec.fields[fld].strip():
+            items.append((rec.fields[fld], _font_for(rec.corpus)))
     model = MaskedWindowModel(_model_cfg(cfg, 8, None))
 
     def batches():
         rng = np.random.default_rng(cfg.seed)
+        encoders = {}
         while True:
-            idx = rng.integers(0, len(texts), cfg.batch_sentences)
-            yield encode([texts[i] for i in idx])
+            idx = rng.integers(0, len(items), cfg.batch_sentences)
+            by_font: dict = {}
+            for i in idx:
+                text, font = items[int(i)]
+                by_font.setdefault(font, []).append(text)
+            parts = []
+            for font, texts_f in by_font.items():
+                enc = encoders.setdefault(font, _window_batcher(None, cfg, rcfg, font))
+                parts.append(enc(texts_f))
+            n = max(p.shape[1] for p in parts)
+            import torch as _t
+
+            padded = [
+                _t.nn.functional.pad(p, (0, 0, 0, 0, 0, n - p.shape[1]), value=1.0) for p in parts
+            ]
+            yield _t.cat(padded, dim=0)
 
     return model, batches(), (lambda m, b: m(b)[0]), None
 
