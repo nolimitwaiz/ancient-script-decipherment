@@ -64,3 +64,20 @@ test partitions remain untouched, as designed.
 
 Pixel-model kill-gate (200 steps, run 1709819): eval CE 6.3034 — pipeline
 proven on GPU; full 3-seed runs pending.
+
+### Sealed-LM hypotheses evaluated against count baselines (2026-08-05)
+
+Preregistered claim: each sealed LM beats a unigram baseline substantially.
+Baselines fit on the same train partition, scored on the same valid slice
+(nats/char; frozen test partitions untouched):
+
+| corpus | unigram | bigram | sealed LM | bits/char | vs bigram |
+|---|---|---|---|---|---|
+| hebrew_morphhb | 3.577 | 2.561 | **1.511** | 2.18 | −41.0% |
+| coptic_scriptorium | 3.013 | 2.507 | **1.258** | 1.82 | −49.8% |
+| greek_first1k | 3.760 | 2.806 | **1.599** | 2.31 | −43.0% |
+
+Hypotheses CONFIRMED: all three cut cross-entropy by ~58% vs unigram and
+41–50% vs a bigram model — they learned real orthographic structure, not
+frequency. At 1.8–2.3 bits/char these are credible small-corpus character LMs,
+adequate as Phase 5 plausibility scorers.

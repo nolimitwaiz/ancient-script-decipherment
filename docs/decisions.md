@@ -143,3 +143,19 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
 - DINOv2/v3 CHECKPOINTS are banned from the sealed pipeline (web-pretrained =
   lookahead contamination; CI gate enforces). Permitted one day only as an
   explicitly-labeled open-book comparison in contrib/openbook/ (Phase 8).
+
+## Phase 3 findings (2026-08-05)
+
+- Sealed-LM preregistered hypotheses CONFIRMED against computed unigram AND
+  bigram baselines (glyphos/eval/lm_baselines.py). Baselines are now code, not
+  an assumption — any future LM claim must clear them.
+- KNOWN LIMITATION in the in-flight headline runs: target subword vocab was
+  requested at 10k, and SentencePiece yields 8,893 pieces for only ~142k
+  training subword tokens = 16 tokens/vocab slot (healthy >50). A 2k vocab
+  gives 90 tokens/slot. Both arms share the target vocab, so the pixel-vs-BPE
+  comparison stays fair, but both are handicapped in absolute terms.
+  NOT fixed by cancelling: per-token perplexity is NOT comparable across
+  vocabularies, so vocab must be selected on a vocab-independent metric.
+  Phase 4 selects it by chrF on validation, then the headline is rerun at the
+  chosen size — recorded as a separate ledger family so nothing is
+  cherry-picked.
