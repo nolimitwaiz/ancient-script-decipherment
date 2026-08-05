@@ -64,6 +64,12 @@ def prepare_text(text: str) -> str:
     return " ".join(_G_TAG.sub(PLACEHOLDER, text).split())
 
 
+def max_strip_width(cfg: RenderConfig) -> int:
+    """Widest strip the window budget can consume; also keeps surfaces inside
+    cairo's allocation limit for very long inputs."""
+    return (cfg.max_windows - 1) * cfg.stride + cfg.window_w
+
+
 def render_strip(text: str, cfg: RenderConfig, font_family: str | None = None) -> np.ndarray:
     cairo, Pango, PangoCairo = _backend()
     text = prepare_text(text)
@@ -79,15 +85,27 @@ def render_strip(text: str, cfg: RenderConfig, font_family: str | None = None) -
         layout.set_text(text, -1)
         return layout
 
-    # measure pass
-    measure = cairo.ImageSurface(cairo.FORMAT_A8, 1, 1)
-    layout = _layout(cairo.Context(measure))
-    w, h = layout.get_pixel_size()
-    if w == 0 or h == 0:
-        raise ValueError(f"text rendered to zero size with font {family!r}: {text[:40]!r}")
+    # Measure on a 1x1 surface (cheap), truncating until the strip fits the
+    # window budget. Long inputs (Greek paragraphs, Coptic pages) otherwise
+    # ask cairo for a surface wider than it will allocate. Truncation is not a
+    # loss: slice_windows caps at cfg.max_windows, so the extra was never seen.
+    limit = max_strip_width(cfg)
+    for _ in range(4):
+        measure = cairo.ImageSurface(cairo.FORMAT_A8, 1, 1)
+        layout = _layout(cairo.Context(measure))
+        w, h = layout.get_pixel_size()
+        if w == 0 or h == 0:
+            raise ValueError(f"text rendered to zero size with font {family!r}: {text[:40]!r}")
+        scale = min(1.0, cfg.window_h / h)
+        out_w = max(1, int(np.ceil(w * scale)))
+        if out_w <= limit:
+            break
+        keep = max(1, int(len(text) * (limit / out_w) * 0.95))
+        if keep >= len(text):
+            break
+        text = text[:keep]
 
-    scale = min(1.0, cfg.window_h / h)
-    out_w = max(1, int(np.ceil(w * scale)))
+    out_w = min(out_w, limit)
     surface = cairo.ImageSurface(cairo.FORMAT_A8, out_w, cfg.window_h)
     ctx = cairo.Context(surface)
     ctx.translate(0, (cfg.window_h - h * scale) / 2)

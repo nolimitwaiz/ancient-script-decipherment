@@ -138,3 +138,20 @@ def test_render_strip_produces_ink():
     assert strip.max() > 0.9  # background present
     again = render_strip("ἐν ἀρχῇ ἦν ὁ λόγος", CFG)
     np.testing.assert_array_equal(strip, again)
+
+
+@pytest.mark.skipif(
+    not pytest.importorskip("importlib.util").find_spec("cairo"),
+    reason="cairo backend not in this environment",
+)
+def test_render_strip_truncates_beyond_window_budget():
+    """A Greek-paragraph-sized input must fit the window budget, not explode
+    cairo (regression: SSL kill-gate 1709839)."""
+    from glyphos.render.renderer import max_strip_width, render_strip
+
+    limit = max_strip_width(CFG)
+    strip = render_strip("λόγος " * 4000, CFG)
+    assert strip.shape[0] == CFG.window_h
+    assert limit * 0.9 <= strip.shape[1] <= limit  # fills the budget, never exceeds it
+    tiny = RenderConfig(max_windows=4)
+    assert render_strip("λόγος " * 4000, tiny).shape[1] <= max_strip_width(tiny)
