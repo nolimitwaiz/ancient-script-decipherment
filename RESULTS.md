@@ -81,3 +81,37 @@ Hypotheses CONFIRMED: all three cut cross-entropy by ~58% vs unigram and
 41–50% vs a bigram model — they learned real orthographic structure, not
 frequency. At 1.8–2.3 bits/char these are credible small-corpus character LMs,
 adequate as Phase 5 plausibility scorers.
+
+## First pixel-vs-BPE comparison (3 seeds each, 2026-08-06) — PRELIMINARY
+
+Egyptian→German, TLA Earlier Egyptian, `dedup` split (cohort-held-out +
+near-duplicate removal). Validation cross-entropy, lower is better. Frozen
+test partitions still untouched.
+
+| arm | n | params | steps | valid CE (mean ± sd) | ppl |
+|---|---|---|---|---|---|
+| BPE control (transliteration) | 3 | 36.9M | 12,000 | **5.616 ± 0.071** | ~275 |
+| Pixel (rendered hieroglyphs) | 3 | 95.9M | 11,000 | 5.975 ± 0.098 | ~394 |
+
+**Δ = +0.359 nats in favour of BPE, ≈4.2 pooled seed-sd.** The gap is far
+larger than seed noise: at this data scale the pixel encoder does NOT beat the
+text baseline.
+
+This is NOT yet the spec's headline claim, and must not be reported as one:
+
+1. **Capacity is not matched.** Pixel 95.9M vs BPE 36.9M — the pixel model is
+   2.6× larger and still loses, which on ~10k sentences reads as overfitting,
+   not as a fair test. The spec requires matched params AND/OR matched compute,
+   stating which; neither was matched here.
+2. **No SSL warm start.** Pixel encoders are the arm expected to need
+   pretraining; `ssl-pretrain-multiscript` exists precisely for this and its
+   kill-gate passed (loss 1.233 → 0.042) but the full run has not been used.
+3. **Oversized target vocab** (8,893 pieces, ~16 training tokens/slot)
+   handicaps both arms; vocab must be chosen on a vocab-independent metric
+   (chrF, Phase 4).
+4. **Metric is proxy.** chrF/BLEU on the frozen test set is the deliverable;
+   validation CE is a selection metric only.
+
+Honest reading: *as configured*, transliteration tokens beat rendered pixels
+by a wide margin. Whether that survives capacity matching, SSL pretraining and
+a right-sized vocab is exactly what Phase 4 must determine.

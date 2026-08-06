@@ -159,3 +159,11 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   Phase 4 selects it by chrF on validation, then the headline is rerun at the
   chosen size — recorded as a separate ledger family so nothing is
   cherry-picked.
+- 2026-08-06 INCIDENT: sync.sh pushed the whole repo including runs/, so the
+  local ledger overwrote the cluster's compacted ledger and destroyed 12
+  events. Fixes: (a) sync.sh never pushes runs/ — the cluster ledger is
+  authoritative for cluster runs and is merged on pull; (b)
+  scripts/recover_ledger.py reconstructs lost entries from checkpoint
+  config.json (written at run start) + slurm stdout, marking every recovered
+  run `reconstructed=true` with its evidence cited. Reconstruction is NOT
+  preregistration and is labelled as such.
