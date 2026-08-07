@@ -31,3 +31,6 @@ docs/reports/**/*.synctex.gz
 
 # macOS
 .DS_Store
+
+# Local working notes, not part of the published project
+MEMORY.md

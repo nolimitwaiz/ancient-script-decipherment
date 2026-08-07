@@ -10,7 +10,7 @@ Pin a type only when a job genuinely needs it (`--gres=gpu:a100:N`).
 
 ## One-time setup
 
-1. Authorize the Mac's key (interactive, run in a local session so output
+1. Authorize the Mac's key (interactive, run locally so output
    lands in-chat):
 
        ! ssh-copy-id -i ~/.ssh/id_ed25519.pub <user>@your-cluster-login-host
