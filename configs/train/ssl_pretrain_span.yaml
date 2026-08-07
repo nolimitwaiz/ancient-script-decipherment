@@ -1,0 +1,17 @@
+# A1b: MAE with SPAN masking — isolates the overlap-leak fix from the objective.
+# A1 (random masking) reached train loss 0.005 by copying from 50%-overlapping
+# neighbours; spans hide their interior from every surviving window.
+task: ssl
+corpora: [tla_earlier_egyptian, tla_late_egyptian, coptic_scriptorium, hebrew_morphhb, greek_first1k]
+scheme: dedup
+family: ssl-pretrain-span-mae
+mask_mode: span
+hypothesis: >
+  P1: span-masked reconstruction is a non-trivial objective (training loss
+  settles well above A1's 0.005) and its encoder beats random-masked A1 by
+  >=0.15 nats downstream on the pixel translation arm.
+max_steps: 80000
+batch_sentences: 24
+grad_accum: 4
+eval_every: 1000000
+max_src_len: 128

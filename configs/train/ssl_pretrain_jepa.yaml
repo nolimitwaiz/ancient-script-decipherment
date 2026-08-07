@@ -1,0 +1,17 @@
+# A2: I-JEPA — predict target-span REPRESENTATIONS via an EMA target encoder.
+# Collapse detector aborts the run if target variance dies (a collapsed encoder
+# posts a beautiful loss and carries zero information).
+task: jepa
+corpora: [tla_earlier_egyptian, tla_late_egyptian, coptic_scriptorium, hebrew_morphhb, greek_first1k]
+scheme: dedup
+family: ssl-pretrain-ijepa
+hypothesis: >
+  P2: I-JEPA beats span-masked MAE (A1b) by <0.10 nats downstream — i.e. most
+  of the gain over A1 comes from fixing the masking geometry, not from latent
+  prediction, because for glyphs the strokes ARE the semantics and there is
+  less nuisance detail to discard than in natural images.
+max_steps: 80000
+batch_sentences: 24
+grad_accum: 4
+eval_every: 1000000
+max_src_len: 128

@@ -34,7 +34,7 @@ from glyphos.utils.config import load_config
 from glyphos.utils.hashing import config_hash
 from glyphos.utils.seed import set_seed
 
-TASKS = ("char_lm", "translation_bpe", "translation_pixel", "ssl")
+TASKS = ("char_lm", "translation_bpe", "translation_pixel", "ssl", "jepa")
 
 
 @dataclass(frozen=True)
@@ -73,6 +73,8 @@ class TrainRunConfig:
     kill_gate_steps: int = 200
     device: str = "auto"
     warm_start_ssl: str | None = None  # path to an in-repo SSL checkpoint
+    mask_mode: str = "span"  # span fixes the 50% window-overlap leak
+    mask_ratio: float = 0.4
 
     def __post_init__(self):
         if self.task not in TASKS:
@@ -275,6 +277,15 @@ def build_ssl(cfg, train_recs, valid_recs, run_dir):
     return model, batches(), (lambda m, b: m(b)[0]), None
 
 
+def build_jepa(cfg, train_recs, valid_recs, run_dir):
+    """I-JEPA arm: same data stream as `ssl`, latent-prediction objective."""
+    from glyphos.models.ssl import JEPAModel
+
+    model_holder, batches, _, _ = build_ssl(cfg, train_recs, valid_recs, run_dir)
+    del model_holder
+    return JEPAModel(_model_cfg(cfg, 8, None)), batches, (lambda m, b: m(b)[0]), None
+
+
 def _model_cfg(cfg: TrainRunConfig, vocab: int, src_vocab: int | None) -> ModelConfig:
     return ModelConfig(
         d_model=cfg.d_model,
@@ -337,6 +348,7 @@ def main(argv: list[str] | None = None) -> int:
             "translation_bpe": lambda *a: build_translation(*a, pixel=False),
             "translation_pixel": lambda *a: build_translation(*a, pixel=True),
             "ssl": build_ssl,
+            "jepa": build_jepa,
         }
         model, batches, loss_fn, eval_fn = builders[cfg.task](cfg, train_recs, valid_recs, run_dir)
         print(f"[train] {count_params(model):,} params -> {run_dir}")
@@ -359,7 +371,7 @@ def main(argv: list[str] | None = None) -> int:
             eval_fn=eval_fn,
             on_metric=lambda k, v: print(f"[train] {k}={v:.4f}"),
         )
-        if cfg.task == "ssl":
+        if cfg.task in ("ssl", "jepa"):
             torch.save({"ssl_encoder": model.encoder_state()}, run_dir / "ssl_encoder.pt")
         run.log_metrics(
             {
