@@ -1,0 +1,15 @@
+# Capacity-MATCHED BPE control: same 12/3 d512 ff4096 shape as the pixel arm.
+# The first comparison had BPE at 36.9M vs pixel at 95.9M — pixels lost while
+# 2.6x larger, which is not a fair test of the representation.
+task: translation_bpe
+corpora: [tla_earlier_egyptian]
+scheme: dedup
+family: mt-tla-earlier-bpe-matched
+src_field: transliteration
+hypothesis: >
+  At matched capacity (12/3, d512, ff4096) the BPE control's advantage over
+  the pixel arm shrinks: if the 0.359-nat gap was largely a capacity artifact,
+  matched BPE lands within one seed-sd of the pixel arm's 5.975.
+max_steps: 30000
+batch_sentences: 32
+grad_accum: 12

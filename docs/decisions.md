@@ -177,3 +177,15 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   and carries zero information, so without them those arms are unfalsifiable.
   Gromov-Wasserstein (rung 1, no neural net) is included specifically so we can
   tell whether the GIN earns its keep.
+- 2026-08-06 RESEQUENCED (my recommendation, Waiz agreed): Phase 4 evaluation
+  before more SSL objectives. Reasons: (a) the pixel hypothesis was measured on
+  translation-from-clean-transliteration, the task MOST favourable to text
+  tokens — restoration from DAMAGED input is where pixels should win, since a
+  tokenizer must make a hard discrete decision on a broken sign while pixels
+  degrade gracefully; (b) no chrF/BLEU/test evaluation existed, so no claim was
+  reportable at all; (c) capacity matching + vocab sizing + more data are ~1
+  GPU-day and may move the number more than pretraining. A2/A3 designs stand,
+  gated on Phase 4 evidence.
+- Deterministic APS over-covers (~98.5% at a 90% target). Documented rather
+  than silently "fixed" — the guarantee is coverage >= target; randomised APS
+  is a Phase 7 tightening.
