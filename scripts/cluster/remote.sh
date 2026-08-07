@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Run a command on the CLSP cluster: bash scripts/cluster/remote.sh '<command>'
 set -euo pipefail
+# local, gitignored overrides for cluster host/user (see README)
+[ -f "$(dirname "$0")/../../.env.local" ] && . "$(dirname "$0")/../../.env.local"
 host="${GLYPHOS_CLUSTER_HOST:-your-cluster-login-host}"
 user="${GLYPHOS_CLUSTER_USER:-your-username}"
 if [ $# -eq 0 ]; then

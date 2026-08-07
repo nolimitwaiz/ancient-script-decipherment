@@ -34,3 +34,6 @@ docs/reports/**/*.synctex.gz
 
 # Local working notes, not part of the published project
 MEMORY.md
+
+# local machine identity (cluster host/user); never committed
+.env.local

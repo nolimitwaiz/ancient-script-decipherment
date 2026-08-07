@@ -15,6 +15,14 @@ observed as training loss 0.005 in run 1745681. `mask_mode="span"` masks
 contiguous runs instead, so a masked span's interior is not visible in any
 surviving window. JEPA uses span masking by construction.
 
+CRITICAL — target normalisation. Rendered strips are ~95% background, so raw
+pixel MSE is dominated by empty space: predicting all-white scores 0.0344 and
+predicting the per-window mean scores 0.0289 on real TLA renders, while the
+first unnormalised runs sat at 0.042 — i.e. WORSE than trivial. Targets are
+therefore per-window standardised (the MAE paper's `norm_pix_loss`), which
+makes the loss interpretable: predicting the window mean scores ~1.0, so any
+loss below 1.0 is genuine structure and the number is comparable across runs.
+
 Both self-distillation-style objectives can COLLAPSE (constant output, perfect
 loss, zero information). `JEPAModel` therefore tracks target-representation
 variance and raises `RepresentationCollapse` rather than letting a dead run
@@ -84,8 +92,20 @@ def make_mask(mode: str, b: int, n: int, ratio: float, device, generator=None) -
     raise ValueError(f"mask_mode must be 'random' or 'span', got {mode!r}")
 
 
+def normalize_windows(windows: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
+    """Per-window standardisation of reconstruction targets (MAE norm_pix_loss).
+
+    Removes the background's dominance: after this, predicting a window's mean
+    scores ~1.0, so the loss reads directly as "fraction of within-window
+    variance left unexplained".
+    """
+    mean = windows.mean(dim=(-2, -1), keepdim=True)
+    std = windows.std(dim=(-2, -1), keepdim=True)
+    return (windows - mean) / (std + eps)
+
+
 class MaskedWindowModel(nn.Module):
-    """MAE-family: reconstruct masked window pixels."""
+    """MAE-family: reconstruct masked window pixels (per-window standardised)."""
 
     def __init__(
         self,
@@ -93,10 +113,12 @@ class MaskedWindowModel(nn.Module):
         window_h: int = 24,
         window_w: int = 24,
         mask_mode: str = "span",
+        normalize_targets: bool = True,
     ):
         super().__init__()
         self.cfg = cfg
         self.mask_mode = mask_mode
+        self.normalize_targets = normalize_targets
         self.embed = WindowEmbedder(cfg, window_h, window_w)
         self.pos = SinusoidalPositions(cfg.d_model, cfg.max_len)
         self.encoder = Encoder(cfg)
@@ -113,7 +135,8 @@ class MaskedWindowModel(nn.Module):
         x = torch.where(mask.unsqueeze(-1), self.mask_token.expand(b, n, -1), x)
         enc = self.encoder(self.pos(x))
         pred = self.reconstruct(enc).reshape(b, n, h, w)
-        loss = F.mse_loss(pred[mask], windows[mask])
+        target = normalize_windows(windows) if self.normalize_targets else windows
+        loss = F.mse_loss(pred[mask], target[mask])
         return loss, mask
 
     def encoder_state(self) -> dict:
@@ -137,7 +160,7 @@ class JEPAModel(nn.Module):
         ema_momentum: float = 0.996,
         predictor_layers: int = 2,
         collapse_ratio: float = 0.1,
-        warmup_steps: int = 500,
+        warmup_steps: int = 50,
     ):
         super().__init__()
         self.cfg = cfg
@@ -165,6 +188,7 @@ class JEPAModel(nn.Module):
 
         self.ema_momentum = ema_momentum
         self.collapse_ratio = collapse_ratio
+        # must arm inside a 200-step kill-gate, or gates run with no detector
         self.warmup_steps = warmup_steps
         self.register_buffer("_steps", torch.zeros((), dtype=torch.long), persistent=False)
         self.register_buffer("_ref_var", torch.zeros((), dtype=torch.float), persistent=False)
