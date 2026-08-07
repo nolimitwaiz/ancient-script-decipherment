@@ -167,3 +167,13 @@ phase block. Anything touching the hard constraints is NOT decided here alone.
   config.json (written at run start) + slurm stdout, marking every recovered
   run `reconstructed=true` with its evidence cited. Reconstruction is NOT
   preregistration and is labelled as such.
+- 2026-08-06: SSL/graph arms designed and preregistered
+  (docs/experiments/ssl_and_graph_arms.md) with numeric success criteria fixed
+  before running: SSL arms must close >=50% of the measured 0.359-nat pixel
+  deficit; the graph arm must beat frequency-rank matching by >=15 points of
+  sign-mapping accuracy at permutation p<0.01 with the wrong-relative control
+  silent. Collapse detectors are mandatory for I-JEPA (embedding variance) and
+  DINO (teacher entropy) — a collapsed encoder posts a beautiful loss curve
+  and carries zero information, so without them those arms are unfalsifiable.
+  Gromov-Wasserstein (rung 1, no neural net) is included specifically so we can
+  tell whether the GIN earns its keep.
