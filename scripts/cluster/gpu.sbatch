@@ -12,7 +12,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
-#SBATCH --time=24:00:00
+#SBATCH --time=72:00:00  # 24h timed out 4 long runs on 2026-08-07
 #SBATCH --output=runs/slurm-%j.out
 #SBATCH --exclude=c04  # black-hole node: GPU throws "CUDA unknown error" (2 kill-gates eaten)
 

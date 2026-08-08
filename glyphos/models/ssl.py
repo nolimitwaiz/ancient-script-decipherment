@@ -240,7 +240,19 @@ class JEPAModel(nn.Module):
         pred = self.predictor(self.pos(ctx))
 
         loss = F.smooth_l1_loss(pred[mask], targets[mask])
-        return loss, {"target_var": float(var), "mask_frac": float(mask.float().mean())}
+        # Trivial baseline, same discipline as the MAE arm: what a predictor
+        # that always emits the batch-mean target would score. A loss near this
+        # value means the arm learned nothing, however pretty the curve.
+        with torch.no_grad():
+            trivial = F.smooth_l1_loss(
+                targets[mask].mean(dim=0, keepdim=True).expand_as(targets[mask]), targets[mask]
+            )
+        return loss, {
+            "target_var": float(var),
+            "mask_frac": float(mask.float().mean()),
+            "trivial_baseline": float(trivial),
+            "loss_over_trivial": float(loss.detach() / (trivial + 1e-9)),
+        }
 
     def encoder_state(self) -> dict:
         return {"embed": self.embed.state_dict(), "encoder": self.encoder.state_dict()}

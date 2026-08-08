@@ -169,3 +169,13 @@ def test_collapse_detector_arms_within_a_kill_gate():
     """Kill-gates are 200 steps; a 500-step warmup meant the detector never
     armed in the very runs meant to catch problems."""
     assert JEPAModel(TINY).warmup_steps <= 200
+
+
+def test_jepa_reports_its_trivial_baseline():
+    """Same discipline as the MAE arm: a latent-prediction loss is meaningless
+    without the score of predicting the mean target."""
+    torch.manual_seed(0)
+    model = JEPAModel(TINY, warmup_steps=10**6)
+    _, stats = model(torch.rand(2, 12, 24, 24))
+    assert stats["trivial_baseline"] > 0
+    assert "loss_over_trivial" in stats
