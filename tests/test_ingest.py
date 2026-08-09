@@ -144,6 +144,7 @@ def test_registry_is_complete_and_consistent():
         "greek_first1k",
         "cuneiform_cdli",
         "meroitic_rem",
+        "logogram_egy",
     }
     for name, spec in CORPORA.items():
         meta = spec.meta()

@@ -16,6 +16,7 @@ from glyphos.data.ingest import (
     greek,
     hebrew,
     logogram,
+    logogram_egy,
     meroitic,
     stubs,
     tla,
@@ -83,6 +84,12 @@ CORPORA: dict[str, CorpusSpec] = {
             parse=None,
             inventory=logogram.inventory,
             schemes=(),
+        ),
+        CorpusSpec(
+            name=logogram_egy.CORPUS,
+            meta=logogram_egy.meta,
+            parse=logogram_egy.parse,
+            schemes=("random", "document_heldout", "dedup"),
         ),
         CorpusSpec(
             name=greek.CORPUS,
