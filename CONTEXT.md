@@ -1,4 +1,4 @@
-# CONTEXT.md — what Decipherment Bench is and why
+# CONTEXT.md — what Ancient Script Decipherment is and why
 
 ## Mission
 
