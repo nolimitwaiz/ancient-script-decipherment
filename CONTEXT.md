@@ -1,4 +1,4 @@
-# CONTEXT.md — what GLYPHOS is and why
+# CONTEXT.md — what Decipherment Bench is and why
 
 ## Mission
 

@@ -64,6 +64,21 @@
     "n_bytes": 787762,
     "sha256": "4336c72655b792b6e547f32e5f49e6b721036427ef3913d69f86316ac138ef69"
   },
+  "logogram_egy/splits/dedup/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-09T02:50:01+00:00",
+    "n_bytes": 72867,
+    "sha256": "15d620e38c58b02df2fb44f492434733c28a005274b95eba1022815d95a0a2bc"
+  },
+  "logogram_egy/splits/document_heldout/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-09T02:50:01+00:00",
+    "n_bytes": 72867,
+    "sha256": "15d620e38c58b02df2fb44f492434733c28a005274b95eba1022815d95a0a2bc"
+  },
+  "logogram_egy/splits/random/v1/test/records.jsonl": {
+    "frozen_at": "2026-08-09T02:50:01+00:00",
+    "n_bytes": 44658,
+    "sha256": "2df62c611135a7fdd5570ce0713ceed63471ae155a3d64c9b740a6abfd4b2e2f"
+  },
   "tla_demotic/splits/dedup/v1/test/records.jsonl": {
     "frozen_at": "2026-08-02T04:34:24+00:00",
     "n_bytes": 828394,

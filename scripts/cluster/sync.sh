@@ -3,6 +3,8 @@
 # runs/ outputs). Data raw trees go too (they are the reproducibility record);
 # the HF cache is excluded (regenerable).
 set -euo pipefail
+# local, gitignored overrides for cluster host/user (see README)
+[ -f "$(dirname "$0")/../../.env.local" ] && . "$(dirname "$0")/../../.env.local"
 host="${GLYPHOS_CLUSTER_HOST:-your-cluster-login-host}"
 user="${GLYPHOS_CLUSTER_USER:-your-username}"
 root="${GLYPHOS_CLUSTER_ROOT:-glyphos}"   # relative to remote $HOME unless absolute

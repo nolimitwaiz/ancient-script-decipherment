@@ -149,6 +149,21 @@
       "translation": "-"
     },
     {
+      "corpus": "logogram_egy",
+      "data_version": "4940320674c3",
+      "documents": 14,
+      "encoding": "hieroglyphic lineart PNG + transliteration",
+      "inventory": null,
+      "kind": "parallel",
+      "license": "unstated upstream — research use, cite the paper",
+      "notes": "REAL scholarly linearts, not font renders; doc_id = dating cohort; image paths are relative to the corpus raw dir",
+      "sentences": 1320,
+      "source": "https://github.com/taineleau/logogramNLP (Chen et al., ACL 2024), data/EGY",
+      "status": "ingested",
+      "tokens_primary": 1320,
+      "translation": "en"
+    },
+    {
       "corpus": "greek_first1k",
       "data_version": "0bf0e2da23cb",
       "documents": 1090,

@@ -1,4 +1,4 @@
-# GLYPHOS smoke pipeline (Phase 0). Deterministic; must finish in <5 min on CPU.
+# Decipherment Bench smoke pipeline (Phase 0). Deterministic; must finish in <5 min on CPU.
 seed: 1337
 n_sentences: 240
 doc_size: 8

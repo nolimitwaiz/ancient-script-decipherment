@@ -155,3 +155,44 @@ def test_render_strip_truncates_beyond_window_budget():
     assert limit * 0.9 <= strip.shape[1] <= limit  # fills the budget, never exceeds it
     tiny = RenderConfig(max_windows=4)
     assert render_strip("λόγος " * 4000, tiny).shape[1] <= max_strip_width(tiny)
+
+
+def test_trim_to_ink_removes_padding():
+    """LogogramNLP textlines are padded onto an 8464px canvas while glyphs
+    occupy the first ~2%; untrimmed, ~98% of sliced windows are blank."""
+    from glyphos.render.images import trim_to_ink
+
+    padded = np.ones((16, 4000), dtype=np.float32)
+    padded[4:12, 10:210] = 0.0  # the only ink
+    trimmed = trim_to_ink(padded)
+    assert trimmed.shape[1] < 250, f"padding survived: width {trimmed.shape[1]}"
+    assert trimmed.shape[0] <= 16
+    assert float((trimmed < 0.5).mean()) > float((padded < 0.5).mean()) * 10
+
+
+def test_trim_to_ink_passes_through_blank_images():
+    from glyphos.render.images import trim_to_ink
+
+    blank = np.ones((16, 100), dtype=np.float32)
+    assert trim_to_ink(blank).shape == blank.shape  # never returns an empty array
+
+
+@pytest.mark.skipif(
+    not pytest.importorskip("importlib.util").find_spec("PIL"),
+    reason="Pillow not installed",
+)
+def test_load_strip_matches_render_contract(tmp_path):
+    """A real image and a font render must be interchangeable downstream."""
+    from PIL import Image
+
+    from glyphos.render.images import load_strip
+
+    arr = np.full((16, 800), 255, dtype=np.uint8)
+    arr[3:13, 5:120] = 0
+    Image.fromarray(arr).save(tmp_path / "line.png")
+    strip = load_strip(tmp_path / "line.png", CFG)
+    assert strip.shape[0] == CFG.window_h
+    assert strip.dtype == np.float32
+    assert strip.min() >= 0.0 and strip.max() <= 1.0
+    assert strip.shape[1] <= 400  # trimmed, not the full 800-wide canvas
+    slice_windows(strip, CFG)  # must feed the standard window path

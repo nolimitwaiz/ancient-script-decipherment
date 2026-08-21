@@ -132,3 +132,50 @@ def test_jepa_encoder_warm_starts_a_pixel_model():
     warm_start_from_ssl(pix, jepa.encoder_state())
     for a, b in zip(pix.encoder.parameters(), jepa.encoder.parameters(), strict=True):
         torch.testing.assert_close(a, b)
+
+
+def test_normalised_targets_make_the_loss_interpretable():
+    """Rendered strips are ~95% background; unnormalised MSE is dominated by
+    empty space (real TLA renders: all-white scores 0.0344, per-window mean
+    0.0289 — both BETTER than the first runs' 0.042). Per-window
+    standardisation fixes the scale: predicting the mean scores ~1.0."""
+    from glyphos.models.ssl import normalize_windows
+
+    torch.manual_seed(0)
+    sparse = torch.ones(4, 8, 24, 24)
+    sparse[:, :, 10:13, 10:13] = 0.0  # ~1.5% ink, like a real glyph strip
+
+    raw_trivial = ((sparse - sparse.mean(dim=(-2, -1), keepdim=True)) ** 2).mean()
+    assert raw_trivial < 0.05, "raw MSE is background-dominated (that is the bug)"
+
+    normed = normalize_windows(sparse)
+    norm_trivial = ((normed - normed.mean(dim=(-2, -1), keepdim=True)) ** 2).mean()
+    assert 0.9 <= float(norm_trivial) <= 1.1, "normalised: predicting the mean must score ~1.0"
+
+
+def test_mae_uses_normalised_targets_by_default():
+    torch.manual_seed(0)
+    model = MaskedWindowModel(TINY)
+    assert model.normalize_targets
+    sparse = torch.ones(2, 10, 24, 24)
+    sparse[:, :, 8:12, 8:12] = 0.0
+    loss, _ = model(sparse)
+    # an untrained model on standardised targets sits near or above 1.0;
+    # if it were reading raw pixels it would start near 0.03 and look "great"
+    assert float(loss) > 0.3, f"loss {float(loss):.4f} suspiciously low — targets unnormalised?"
+
+
+def test_collapse_detector_arms_within_a_kill_gate():
+    """Kill-gates are 200 steps; a 500-step warmup meant the detector never
+    armed in the very runs meant to catch problems."""
+    assert JEPAModel(TINY).warmup_steps <= 200
+
+
+def test_jepa_reports_its_trivial_baseline():
+    """Same discipline as the MAE arm: a latent-prediction loss is meaningless
+    without the score of predicting the mean target."""
+    torch.manual_seed(0)
+    model = JEPAModel(TINY, warmup_steps=10**6)
+    _, stats = model(torch.rand(2, 12, 24, 24))
+    assert stats["trivial_baseline"] > 0
+    assert "loss_over_trivial" in stats
