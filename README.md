@@ -1,4 +1,4 @@
-# GLYPHOS
+# Decipherment Bench
 
 From-scratch visual decipherment research stack: pixel-representation MT
 (Salesky/Koehn lineage), OT/min-cost-flow decipherment (Luo & Barzilay lineage),
@@ -6,6 +6,9 @@ and a quant-derived statistical epistemics layer — validated by *artificial
 decipherment* (hide the key of an already-deciphered script, measure recovery).
 
 Graduate research project, JHU CLSP (advisor: Philipp Koehn).
+
+The Python import namespace remains `glyphos` for compatibility with existing
+experiments, ledgers, and cluster runs.
 
 ## Hard constraints (see CONVENTIONS.md — never violate)
 

@@ -1,4 +1,4 @@
-# Rules of work for GLYPHOS
+# Rules of work for Decipherment Bench
 
 Read CONTEXT.md for what this project is; read MEMORY.md for where it currently
 stands. This file is the rulebook. These rules override defaults.
