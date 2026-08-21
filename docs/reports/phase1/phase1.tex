@@ -6,11 +6,11 @@
 \usepackage{parskip}
 
 % Bump on every substantive edit (phase1-v1 -> phase1-v2), then `make reports`.
-\newcommand{\ReportStamp}{phase1-v2}
+\newcommand{\ReportStamp}{phase1-v3}
 
-\title{Decipherment Bench --- Phase 1 Report\\
-\large Data: Acquisition, Census, Frozen Splits}
-\author{Waiz Khan\\ \small JHU CLSP --- advisor: Philipp Koehn}
+\title{\Large Ancient Script Decipherment\\
+\large Phase 1: Data, Census, and Frozen Splits}
+\author{Waiz Khan \quad \small JHU CLSP --- advisor: Philipp Koehn}
 \date{August 2, 2026 \quad {\small stamp: \ReportStamp}}
 
 \begin{document}
@@ -25,7 +25,8 @@ Coptic deduplication, 15\,s of CPU). \texttt{make check} is green (lint, 80
 tests, no-pretrained gate, smoke).
 
 \section{Census}
-\begin{table}[h]\centering\small
+\begin{table}[h]\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lrrrll}
 \toprule
 corpus & sentences & docs & tokens & translation & source \\
@@ -125,6 +126,6 @@ CDLI $-$1{,}891); TLA headline splits keep the full near-duplicate pass.
 
 \vfill
 \noindent\rule{\linewidth}{0.4pt}\\
-{\small Decipherment Bench Phase 1 report \(\cdot\) stamp \ReportStamp{} \(\cdot\)
+{\small Ancient Script Decipherment Phase 1 report \(\cdot\) stamp \ReportStamp{} \(\cdot\)
 regenerate with \texttt{make reports}}
 \end{document}

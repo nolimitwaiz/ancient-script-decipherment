@@ -1,4 +1,4 @@
-# Decipherment Bench
+# Ancient Script Decipherment
 
 From-scratch visual decipherment research stack: pixel-representation MT
 (Salesky/Koehn lineage), OT/min-cost-flow decipherment (Luo & Barzilay lineage),

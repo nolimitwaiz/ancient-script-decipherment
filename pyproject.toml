@@ -1,5 +1,5 @@
 [project]
-name = "decipherment-bench"
+name = "ancient-script-decipherment"
 version = "0.0.1"
 description = "From-scratch visual decipherment research stack: pixel MT, OT decipherment, quant epistemics"
 readme = "README.md"

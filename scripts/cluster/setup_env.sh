@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap the Decipherment Bench environment ON the cluster (run via remote.sh).
+# Bootstrap the Ancient Script Decipherment environment ON the cluster (run via remote.sh).
 set -euo pipefail
 cd "${GLYPHOS_CLUSTER_ROOT:-$HOME/glyphos}"
 
